@@ -305,7 +305,8 @@
 
     // 两张图叠在一起做交叉淡入：新图淡入的同时旧图淡出，不会闪白也不会跳
     // instant=true（手动滑动翻页）时不淡入，直接切换
-    function showImage(src, crop, instant) {
+    // onShown：新图真正显示到画框之后回调（标题等它）
+    function showImage(src, crop, instant, onShown) {
       var next = layers[1 - cur];
       var my = ++token;
       function swap() {
@@ -322,6 +323,7 @@
         next.classList.add('on');
         layers[cur].classList.remove('on');
         cur = 1 - cur;
+        if (typeof onShown === 'function') onShown();   // 图片已经换上了，再叫标题出场
       }
       next.onerror = function () { next.onerror = null; next.src = url('assets/placeholder.svg') };
       next.onload = swap;
@@ -335,12 +337,12 @@
         return '<span class="ch" style="--i:' + i + '">' + (ch === ' ' ? '&nbsp;' : esc(ch)) + '</span>';
       }).join('');
     }
-    var textGuard = null, textSwapTimer = null;
-    /* 换图时的先后顺序：
-       ① 旧标题先淡出（240ms）
-       ② 图片开始淡入（CSS .9s）
-       ③ 标题/白底再进场，字比图慢一点点，读完图片才看到文字 */
-    function setText(w, instant) {
+    var textGuard = null, textSwapTimer = null, paintSeq = 0;
+    /* 标题不再用固定延时，而是等「图片真的显示出来」再换：
+       ① 换图一开始，旧标题先淡出
+       ② 图片加载完成、真正铺到画框上以后，再换文案并播入场动画
+       ③ 万一图片加载失败或太慢，3.5s 后标题照常出现，不会一直空着 */
+    function setText(w, instant, delay) {
       var line = w.tagline || w.summary || firstSentence(w.description) || '';
       var nChars = Array.from(String(w.title || '')).length;
       clearTimeout(textSwapTimer);
@@ -372,14 +374,20 @@
           Math.max(1800, nChars * 60 + 900 + 400));
       }
 
-      if (instant) { text.classList.remove('is-out'); applyText(); return }
-
-      // 先把旧标题淡掉，等它退场后再换字、再进场
-      text.classList.add('is-out');
-      textSwapTimer = setTimeout(function () {
+      function run() {
         text.classList.remove('is-out');
         applyText();
-      }, 240);
+      }
+
+      if (instant) { run(); return run }
+
+      // 先把旧标题淡掉，等图片显示出来再换字（delay 由图片 onShown 触发）
+      text.classList.add('is-out');
+      if (typeof delay === 'number') {
+        textSwapTimer = setTimeout(run, Math.max(0, delay));
+      }
+      // 不传 delay 时由调用方（图片 onShown）调用返回的函数
+      return run;
     }
     // 手机宽度用竖版取景（9:16），桌面用横版
     var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
@@ -389,10 +397,22 @@
     }
     function paint(instant) {
       var w = list[idx];
-      setText(w, instant);
       var crop = cropFor(w);
       var heroImg = (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
-      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop, instant);
+      // 先让旧标题淡出，拿到「图片显示后」要执行的换字函数
+      var showText = setText(w, instant);
+      var textDone = false;
+      var myPaint2 = ++paintSeq;
+      function doText() {
+        if (myPaint2 !== paintSeq) return;
+        if (textDone) return;
+        textDone = true;
+        clearTimeout(slowGuard);
+        if (!instant) showText && showText();          // 图片已经显示 → 标题接上
+      }
+      // 图片加载失败 / 太慢时，别让标题一直空着
+      var slowGuard = setTimeout(doText, instant ? 0 : 3500);
+      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop, instant, doText);
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
       renderDots();
