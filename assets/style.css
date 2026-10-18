@@ -105,7 +105,7 @@ img{max-width:100%}
   .feature-dots{gap:7px}
   .hero{padding-top:28px}
   /* 手机上轮播换竖版取景 3:4 */
-  .feature-frame{aspect-ratio:2/3;max-width:none}
+  .feature-frame{aspect-ratio:9/16;max-width:none}
 }
 
 /* ---------- grids ---------- */
@@ -432,7 +432,7 @@ img{max-width:100%}
 @media(max-width:640px){
   .hero{display:block;min-height:0;padding:8px 0 24px}
   .feature{gap:10px}
-  .feature-frame{aspect-ratio:2/3;max-width:100%}
+  .feature-frame{aspect-ratio:9/16;max-width:100%}
   .feature-copy h1{font-size:18px}
   .feature-copy p{font-size:11px}
   .feature-text{gap:30px}
@@ -452,3 +452,7 @@ img{max-width:100%}
   .info-row.info-inline{gap:9px;padding:6px 0}
   .info-row.info-inline .info-year{padding-left:8px}
 }
+
+/* 轮播滑动翻页：竖向仍可滚动页面，横向由 JS 接管（回弹动画由 JS 控制） */
+.feature-frame{touch-action:pan-y;cursor:grab}
+.feature-frame:active{cursor:grabbing}

@@ -395,6 +395,53 @@
       go(Number(b.dataset.i) || 0); schedule();
     });
 
+    /* ---------------- 滑动翻页（手机滑、桌面按住拖） ---------------- */
+    var dragX = 0, dragY = 0, dragging = false, isDrag = false, suppressClick = false;
+    var THRESH = 42;          // 横向拖过这么多像素就翻页
+    var MAX_LEAN = 28;        // 拖动时最多跟手位移
+
+    function clampLean(dx) {
+      return Math.max(-MAX_LEAN, Math.min(MAX_LEAN, dx * 0.22));
+    }
+    frame.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (list.length < 2) return;
+      dragging = true; isDrag = false;
+      dragX = e.clientX; dragY = e.clientY;
+    });
+    frame.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - dragX, dy = e.clientY - dragY;
+      if (!isDrag && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        isDrag = true;
+        frame.style.transition = 'none';
+        try { frame.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      if (isDrag) frame.style.transform = 'translateX(' + clampLean(dx) + 'px)';
+    });
+    function endDrag(e, cancelled) {
+      if (!dragging) return;
+      dragging = false;
+      var dx = e.clientX - dragX, dy = e.clientY - dragY;
+      frame.style.transition = 'transform .26s cubic-bezier(.2,.72,.28,1)';
+      frame.style.transform = '';
+      setTimeout(function () { frame.style.transition = ''; }, 300);
+      if (!cancelled && isDrag && Math.abs(dx) > THRESH && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) go(idx + 1); else go(idx - 1);
+        schedule();
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 450);
+      }
+      isDrag = false;
+    }
+    frame.addEventListener('pointerup', function (e) { endDrag(e, false); });
+    frame.addEventListener('pointercancel', function (e) { endDrag(e, true); });
+    frame.addEventListener('pointerleave', function (e) { if (dragging) endDrag(e, true); });
+    // 拖完别顺手把链接点开
+    frame.addEventListener('click', function (e) {
+      if (suppressClick) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
     // 轮播要用「取景参数 / 详情图第一张 / 一句话简介」，这些都可能在 meta.json 里。
     // 精选件数通常很少，统一先读一遍再首次渲染，避免先闪一下再换。
     Promise.all(list.map(function (w) {
