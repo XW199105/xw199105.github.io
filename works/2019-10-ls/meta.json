@@ -1,0 +1,22 @@
+{
+  "id": "2019-10-ls",
+  "title": "留神",
+  "date": "2019-10-28",
+  "tags": [
+    "视觉插画"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1.8,
+    "panU": 0.0333,
+    "panV": -0.1778
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "2021-08-em",
+  "title": "噩梦拜拜",
+  "date": "2021-08-17",
+  "tags": [
+    "随笔练习",
+    "视觉插画"
+  ],
+  "tagline": "与梦魇战斗",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg",
+    "05.jpg",
+    "06.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "06.jpg",
+    "zoom": 1.34,
+    "panU": 0.0467,
+    "panV": -0.0289
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}
