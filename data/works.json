@@ -4,23 +4,22 @@
     "视觉插画",
     "随笔练习",
     "实物雕塑",
-    "过程分享",
     "同人练习"
   ],
   "works": [
     {
-      "id": "2026-08-bgy",
-      "title": "比个YE",
-      "date": "2026-08-03",
+      "id": "2024-02-long",
+      "title": "龙",
+      "date": "2024-02-18",
       "tags": [
-        "随笔练习"
+        "实物雕塑"
       ],
       "tagline": "",
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
-      "meta": "works/2026-08-bgy/meta.json",
-      "featured": false
+      "meta": "works/2024-02-long/meta.json",
+      "featured": true
     },
     {
       "id": "2026-06-hb",
@@ -35,6 +34,20 @@
       "image": "01.jpg",
       "meta": "works/2026-06-hb/meta.json",
       "featured": true
+    },
+    {
+      "id": "2026-08-bgy",
+      "title": "比个YE",
+      "date": "2026-08-03",
+      "tags": [
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2026-08-bgy/meta.json",
+      "featured": false
     },
     {
       "id": "2026-02-xi",
@@ -148,20 +161,6 @@
       "cover": "cover.jpg",
       "image": "01.jpg",
       "meta": "works/2024-03-zz/meta.json",
-      "featured": true
-    },
-    {
-      "id": "2024-02-long",
-      "title": "龙",
-      "date": "2024-02-18",
-      "tags": [
-        "实物雕塑"
-      ],
-      "tagline": "",
-      "summary": "",
-      "cover": "cover.jpg",
-      "image": "01.jpg",
-      "meta": "works/2024-02-long/meta.json",
       "featured": true
     },
     {

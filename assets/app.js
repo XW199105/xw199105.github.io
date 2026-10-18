@@ -252,12 +252,13 @@
     }
 
     host.innerHTML =
-      '<div class="feature-copy"><div class="feature-text" id="feature-text">' +
-        '<h1 id="feature-title"></h1><p id="feature-desc"></p>' +
-      '</div></div>' +
       '<div class="feature-visual" id="feature-visual">' +
         '<a class="feature-frame" id="feature-frame" href="#">' +
           '<img class="feat-img on" alt=""><img class="feat-img" alt="">' +
+          // 标题压在图片左下角，垫一层透明白底
+          '<div class="feature-copy"><div class="feature-text" id="feature-text">' +
+            '<h1 id="feature-title"></h1><p id="feature-desc"></p>' +
+          '</div></div>' +
         '</a>' +
         '<div class="feature-controls">' +
           '<button class="circle-btn" id="feature-prev" aria-label="上一件">←</button>' +
@@ -342,6 +343,12 @@
       title.innerHTML = splitChars(w.title);           // 新元素 → 动画自动从头播
       desc.textContent = line;
       desc.style.display = line ? '' : 'none';
+      var panel = text.parentNode;
+      if (panel && panel.classList && panel.classList.contains('feature-copy')) {
+        panel.classList.remove('cap-play');
+        void panel.offsetHeight;                       // 强制重排，让动画从头开始
+        if (!instant) panel.classList.add('cap-play'); // 滑动瞬时切换就不播
+      }
       // 简介是同一个 <p>，不重建的话动画只播一次；这里手动重启
       desc.style.animation = 'none';
       void desc.offsetHeight;                          // 强制重排，让 none 生效
@@ -1029,14 +1036,33 @@
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var hold = reduced ? 500 : 2450;
     var gone = false;
-    function finish() {
+    // instant=true：点击/按键盘时立刻撤掉，不走淡出；自动结束才淡出
+    function finish(instant) {
       if (gone) return;
       gone = true;
+      clearTimeout(autoTimer);
+      if (instant) {
+        if (box.parentNode) box.parentNode.removeChild(box);
+        return;
+      }
       box.classList.add('intro-out');
       setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box) }, reduced ? 60 : 1000);
     }
-    box.addEventListener('click', finish);
-    setTimeout(finish, hold);
+    function skip(e) {
+      if (e && e.cancelable && e.type !== 'keydown') e.preventDefault();
+      finish(true);
+      // 立刻撤掉后，跟着的那一下 click 会落到下面的链接上，吞掉它
+      function swallow(ev) { ev.preventDefault(); ev.stopPropagation(); }
+      document.addEventListener('click', swallow, true);
+      setTimeout(function () { document.removeEventListener('click', swallow, true) }, 400);
+    }
+    box.addEventListener('pointerdown', skip);   // 手指按下即跳过（比 click 更快）
+    box.addEventListener('click', skip);
+    document.addEventListener('keydown', function (e) {
+      if (gone) return;
+      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') skip(e);
+    });
+    var autoTimer = setTimeout(function () { finish(false) }, hold);
   }
 
   function initNav() {    var page = document.body.dataset.page || '';
