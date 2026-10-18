@@ -1,0 +1,27 @@
+{
+  "id": "2025-11-bj",
+  "title": "笔架",
+  "date": "2025-11-16",
+  "tags": [
+    "随笔练习",
+    "实物雕塑"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg",
+    "05.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": 0,
+    "y": 0
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "2022-09-sen",
+  "title": "森",
+  "date": "2022-09-15",
+  "tags": [
+    "随笔练习",
+    "视觉插画"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 2.32,
+    "panU": 0.0044,
+    "panV": 0
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}
