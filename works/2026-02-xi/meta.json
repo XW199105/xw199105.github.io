@@ -1,0 +1,27 @@
+{
+  "id": "2026-02-xi",
+  "title": "西",
+  "date": "2026-02-24",
+  "tags": [
+    "随笔练习"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg",
+    "05.jpg",
+    "06.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": 0,
+    "y": 0
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "2025-11-mf",
+  "title": "马儿",
+  "date": "2025-11-07",
+  "tags": [
+    "实物雕塑"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg",
+    "05.jpg",
+    "06.jpg",
+    "07.jpg",
+    "08.jpg",
+    "09.jpg"
+  ],
+  "featured": true,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1.25,
+    "x": -0.0632,
+    "y": -0.4922
+  },
+  "carouselCrop": {
+    "src": "07.jpg",
+    "zoom": 1.46,
+    "x": 0.2051,
+    "y": -0.9758
+  },
+  "updated": "2026-10-17"
+}

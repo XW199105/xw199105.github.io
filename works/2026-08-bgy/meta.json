@@ -1,0 +1,24 @@
+{
+  "id": "2026-08-bgy",
+  "title": "比个YE",
+  "date": "2026-08-03",
+  "tags": [
+    "随笔练习"
+  ],
+  "tagline": "",
+  "description": "",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg"
+  ],
+  "featured": false,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1.24,
+    "x": -0.7967,
+    "y": 0.7457
+  },
+  "carouselCrop": null,
+  "updated": "2026-10-17"
+}
