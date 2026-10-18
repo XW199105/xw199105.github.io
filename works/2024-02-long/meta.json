@@ -17,13 +17,24 @@
     "07.jpg",
     "08.jpg"
   ],
-  "featured": false,
+  "featured": true,
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.3,
-    "panU": -0.1133,
-    "panV": 0.1022
+    "x": 0.8299,
+    "y": -0.7706
   },
-  "carouselCrop": null,
-  "updated": "2026-10-17"
+  "carouselCrop": {
+    "src": "01.jpg",
+    "zoom": 1.35,
+    "x": 0.7841,
+    "y": -0.7544
+  },
+  "carouselCropM": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": 0.6267,
+    "y": -1
+  },
+  "updated": "2026-10-18"
 }

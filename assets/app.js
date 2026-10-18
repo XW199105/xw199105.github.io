@@ -273,10 +273,34 @@
         frame = $('#feature-frame'), layers = $$('.feat-img', frame),
           dots = $('#feature-dots');
 
-    // 圆点只建一次，之后只切状态，不重建 DOM（避免闪动）
-    dots.innerHTML = list.map(function (x, i) {
-      return '<button class="feature-dot" type="button" data-i="' + i + '" aria-label="第 ' + (i + 1) + ' 件：' + esc(x.title) + '"></button>';
-    }).join('');
+    // 圆点：数量多的时候只显示当前附近的一段（窗口），避免挤掉左右箭头
+    // 精选作品不限数量，全都会参与轮播
+    var DOT_MAX = 9;
+    function dotWindow(n, cur, max) {
+      if (n <= max) return { s: 0, e: n };
+      var half = Math.floor(max / 2);
+      var s = Math.min(Math.max(0, cur - half), n - max);
+      return { s: s, e: s + max };
+    }
+    var dotKey = '';
+    function renderDots() {
+      var win = dotWindow(list.length, idx, DOT_MAX);
+      var key = win.s + ':' + win.e;
+      if (key !== dotKey) {
+        dotKey = key;
+        var html = '';
+        for (var k = win.s; k < win.e; k++) {
+          html += '<button class="feature-dot" type="button" data-i="' + k +
+            '" aria-label="第 ' + (k + 1) + ' 件：' + esc(list[k].title) + '"></button>';
+        }
+        dots.innerHTML = html;
+      }
+      $$('.feature-dot', dots).forEach(function (d) {
+        var on = Number(d.dataset.i) === idx;
+        d.classList.toggle('active', on);
+        if (on) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      });
+    }
 
     // 两张图叠在一起做交叉淡入：新图淡入的同时旧图淡出，不会闪白也不会跳
     function showImage(src, crop) {
@@ -323,20 +347,38 @@
       textGuard = setTimeout(function () { text.classList.add('chars-done') },
         Math.max(1800, nChars * 60 + 900 + 400));
     }
+    // 手机宽度用竖版取景（3:4），桌面用横版
+    var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
+    function cropFor(w) {
+      var m = w.carouselCropM, d = w.carouselCrop;
+      return (mobileMQ.matches && m) ? m : d;
+    }
     function paint() {
       var w = list[idx];
       setText(w);
-      var crop = w.carouselCrop || null;
-      var heroImg = (crop && crop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
+      var crop = cropFor(w);
+      var heroImg = (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
       showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop);
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
-      $$('.feature-dot', dots).forEach(function (d, i) {
-        d.classList.toggle('active', i === idx);
-        if (i === idx) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
-      });
+      renderDots();
     }
     function go(n) { idx = (n + list.length) % list.length; paint(); }
+
+    // 屏幕宽度跨过断点（横竖屏切换）时，重新套用当前这张的取景
+
+    function reapplyCrop() {
+      var w = list[idx]; if (!w) return;
+      var on = layers[1 - cur];
+      if (on && on.naturalWidth) applyFrameCrop(on, cropFor(w));
+      else paint();
+    }
+    if (mobileMQ.addEventListener) mobileMQ.addEventListener('change', reapplyCrop);
+    else if (mobileMQ.addListener) mobileMQ.addListener(reapplyCrop);
+    var rzTimer = null;
+    window.addEventListener('resize', function(){
+      clearTimeout(rzTimer); rzTimer = setTimeout(reapplyCrop, 160);
+    });
 
     // 始终循环：不因悬停、也不因标签页前后台切换而停（后台由浏览器自己降频）
     function schedule() {
@@ -359,6 +401,7 @@
       return loadJSON(w.meta || ('works/' + w.id + '/meta.json')).then(function (m) {
         if (Array.isArray(m.gallery)) w.gallery = m.gallery;
         if (m.carouselCrop) w.carouselCrop = m.carouselCrop;
+        if (m.carouselCropM) w.carouselCropM = m.carouselCropM;
         if (!w.tagline) w.tagline = m.tagline || '';
         if (!w.description) w.description = m.description || '';
       }).catch(function () {});
@@ -532,8 +575,11 @@
           '<h1>' + esc(w.title) + '</h1>' +
           tlHtml +
           descHtml +
-          '<div class="info-row"><span>标签</span><span class="info-tags">' + (tags.length ? tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') : '—') + '</span></div>' +
-          '<div class="info-row"><span>年份</span><span>' + esc(yearOf(w) || '—') + '</span></div>' +
+            '<div class="info-row info-inline">' +
+              '<span class="k">标签</span>' +
+              '<span class="info-tags">' + (tags.length ? tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') : '—') + '</span>' +
+              '<span class="info-year">' + esc(yearOf(w) || '—') + '</span>' +
+            '</div>' +
           '<div class="detail-pager">' +
             (prev ? '<a href="work.html?id=' + encodeURIComponent(prev.id) + '" title="' + esc(prev.title) + '">← 上一件</a>' : '<button disabled>← 上一件</button>') +
             (next ? '<a href="work.html?id=' + encodeURIComponent(next.id) + '" title="' + esc(next.title) + '">下一件 →</a>' : '<button disabled>下一件 →</button>') +
@@ -771,6 +817,17 @@
           '<div class="about-right">' + linksHtml + galleryHtml + '</div>' +
         '</div>';
 
+      // 触屏：第一次点只翻面，再点一次才进入链接
+      $$('.link-cell', $('#about-body')).forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          if (!a.classList.contains('is-flipped')) {
+            e.preventDefault();
+            $$('.link-cell.is-flipped').forEach(function (x) { x.classList.remove('is-flipped') });
+            a.classList.add('is-flipped');
+          }
+        });
+      });
+
       var av = $('.about-avatar');
       if (av) imgErr(av, 'assets/placeholder.svg');
       initAboutGallery();
@@ -922,9 +979,7 @@
     $$('.nav a').forEach(function (a) {
       if (a.dataset.page === page) a.classList.add('active');
     });
-    var btn = $('.mobile-menu');
-    var nav = $('.nav');
-    if (btn && nav) btn.addEventListener('click', function () { nav.classList.toggle('nav-open'); });
+    // 顶部菜单始终显示，不做二级菜单
     var y = $('#year');
     if (y) y.textContent = new Date().getFullYear();
   }

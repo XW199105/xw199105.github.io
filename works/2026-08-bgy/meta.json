@@ -16,9 +16,15 @@
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.24,
-    "x": -0.7967,
-    "y": 0.7457
+    "x": 0.0552,
+    "y": -1
   },
-  "carouselCrop": null,
-  "updated": "2026-10-17"
+  "carouselCrop": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": 1,
+    "y": -0.7702
+  },
+  "carouselCropM": null,
+  "updated": "2026-10-18"
 }

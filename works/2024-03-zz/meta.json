@@ -30,8 +30,14 @@
   "carouselCrop": {
     "src": "01.jpg",
     "zoom": 1,
-    "x": 1,
-    "y": 0.5867
+    "x": -1,
+    "y": 0.3073
   },
-  "updated": "2026-10-17"
+  "carouselCropM": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": -0.1867,
+    "y": -1
+  },
+  "updated": "2026-10-18"
 }

@@ -22,7 +22,7 @@
     "12.jpg",
     "13.jpg"
   ],
-  "featured": true,
+  "featured": false,
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1,
@@ -35,5 +35,11 @@
     "x": -1,
     "y": -0.5511
   },
-  "updated": "2026-10-17"
+  "carouselCropM": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": -0.2667,
+    "y": -1
+  },
+  "updated": "2026-10-18"
 }

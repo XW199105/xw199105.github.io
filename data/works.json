@@ -1,371 +1,372 @@
 {
-    "updated":  "2026-10-17",
-    "tags":  [
-                 "视觉插画",
-                 "随笔练习",
-                 "实物雕塑",
-                 "同人练习"
-             ],
-    "works":  [
-                  {
-                      "id":  "2026-08-bgy",
-                      "title":  "比个YE",
-                      "date":  "2026-08-03",
-                      "tags":  [
-                                   "随笔练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2026-08-bgy/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2026-06-hb",
-                      "title":  "画笔",
-                      "date":  "2026-06-06",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "画一笔的流动",
-                      "summary":  "画一笔的流动",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2026-06-hb/meta.json",
-                      "featured":  true
-                  },
-                  {
-                      "id":  "2026-02-xi",
-                      "title":  "西",
-                      "date":  "2026-02-24",
-                      "tags":  [
-                                   "随笔练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2026-02-xi/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2025-12-hlmf",
-                      "title":  "哈拉莫夫的少女",
-                      "date":  "2025-12-17",
-                      "tags":  [
-                                   "随笔练习",
-                                   "同人练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-12-hlmf/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2025-11-mf",
-                      "title":  "马儿",
-                      "date":  "2025-11-07",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-11-mf/meta.json",
-                      "featured":  true
-                  },
-                  {
-                      "id":  "2025-11-fll",
-                      "title":  "风来了",
-                      "date":  "2025-11-18",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-11-fll/meta.json",
-                      "featured":  true
-                  },
-                  {
-                      "id":  "2025-11-bj",
-                      "title":  "笔架",
-                      "date":  "2025-11-16",
-                      "tags":  [
-                                   "随笔练习",
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-11-bj/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2025-04-mydm2",
-                      "title":  "漫游的梦（简化版）",
-                      "date":  "2025-04-14",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-04-mydm2/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2025-04-mydm1",
-                      "title":  "漫游的梦",
-                      "date":  "2025-04-13",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2025-04-mydm1/meta.json",
-                      "featured":  true
-                  },
-                  {
-                      "id":  "2024-03-zz",
-                      "title":  "驻足",
-                      "date":  "2024-03-12",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2024-03-zz/meta.json",
-                      "featured":  true
-                  },
-                  {
-                      "id":  "2024-02-long",
-                      "title":  "龙",
-                      "date":  "2024-02-18",
-                      "tags":  [
-                                   "实物雕塑"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2024-02-long/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2023-11-fxm",
-                      "title":  "风消鸣",
-                      "date":  "2023-11-18",
-                      "tags":  [
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2023-11-fxm/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2022-09-sen",
-                      "title":  "森",
-                      "date":  "2022-09-15",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2022-09-sen/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2022-05-mdzw",
-                      "title":  "梦地之舞",
-                      "date":  "2022-05-02",
-                      "tags":  [
-                                   "视觉插画",
-                                   "随笔练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2022-05-mdzw/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2021-08-em",
-                      "title":  "噩梦拜拜",
-                      "date":  "2021-08-17",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "与梦魇战斗",
-                      "summary":  "与梦魇战斗",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2021-08-em/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2021-03-ys",
-                      "title":  "游生",
-                      "date":  "2021-03-24",
-                      "tags":  [
-                                   "视觉插画",
-                                   "随笔练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2021-03-ys/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2021-01-fl",
-                      "title":  "风来",
-                      "date":  "2021-01-10",
-                      "tags":  [
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2021-01-fl/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2020-02-nz",
-                      "title":  "脑子里有龙",
-                      "date":  "2020-02-22",
-                      "tags":  [
-                                   "视觉插画"
-                               ],
-                      "tagline":  "哈哈哈哈",
-                      "summary":  "哈哈哈哈",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2020-02-nz/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2019-10-ls",
-                      "title":  "留神",
-                      "date":  "2019-10-28",
-                      "tags":  [
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2019-10-ls/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2019-09-yh",
-                      "title":  "宇航",
-                      "date":  "2019-09-28",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "一小片天气，停在一件外套和一段路之间。",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2019-09-yh/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2019-09-bw",
-                      "title":  "波纹",
-                      "date":  "2019-09-25",
-                      "tags":  [
-                                   "随笔练习"
-                               ],
-                      "tagline":  "",
-                      "summary":  "照料与控制之间，是否存在一条柔软的边界？",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2019-09-bw/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2019-08-qg",
-                      "title":  "弃稿",
-                      "date":  "2019-08-21",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "准备离开的人，似乎总会在门边多停留一会儿。",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2019-08-qg/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2017-10-jx",
-                      "title":  "即兴",
-                      "date":  "2017-10-25",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "关于远处、草地，以及那些没有被说出口的事。",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2017-10-jx/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2017-10-ji",
-                      "title":  "棘",
-                      "date":  "2017-10-06",
-                      "tags":  [
-                                   "随笔练习",
-                                   "视觉插画"
-                               ],
-                      "tagline":  "",
-                      "summary":  "风看不见，但它改变了衣角、头发，也改变了一个瞬间的方向。",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2017-10-ji/meta.json",
-                      "featured":  false
-                  },
-                  {
-                      "id":  "2012-05-j",
-                      "title":  "集",
-                      "date":  "2012-05-10",
-                      "tags":  [
-                                   "视觉插画"
-                               ],
-                      "tagline":  "我们所处的集",
-                      "summary":  "我们所处的集",
-                      "cover":  "cover.jpg",
-                      "image":  "01.jpg",
-                      "meta":  "works/2012-05-j/meta.json",
-                      "featured":  false
-                  }
-              ]
+  "updated": "2026-10-18",
+  "tags": [
+    "视觉插画",
+    "随笔练习",
+    "实物雕塑",
+    "过程分享",
+    "同人练习"
+  ],
+  "works": [
+    {
+      "id": "2026-08-bgy",
+      "title": "比个YE",
+      "date": "2026-08-03",
+      "tags": [
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2026-08-bgy/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2026-06-hb",
+      "title": "画笔",
+      "date": "2026-06-06",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "画一笔的流动",
+      "summary": "画一笔的流动",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2026-06-hb/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2026-02-xi",
+      "title": "西",
+      "date": "2026-02-24",
+      "tags": [
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2026-02-xi/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2025-12-hlmf",
+      "title": "哈拉莫夫的少女",
+      "date": "2025-12-17",
+      "tags": [
+        "随笔练习",
+        "同人练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-12-hlmf/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2025-11-mf",
+      "title": "马儿",
+      "date": "2025-11-07",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-11-mf/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2025-11-fll",
+      "title": "风来了",
+      "date": "2025-11-18",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-11-fll/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2025-11-bj",
+      "title": "笔架",
+      "date": "2025-11-16",
+      "tags": [
+        "随笔练习",
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-11-bj/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2025-04-mydm2",
+      "title": "漫游的梦（简化版）",
+      "date": "2025-04-14",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-04-mydm2/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2025-04-mydm1",
+      "title": "漫游的梦",
+      "date": "2025-04-13",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2025-04-mydm1/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2024-03-zz",
+      "title": "驻足",
+      "date": "2024-03-12",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2024-03-zz/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2024-02-long",
+      "title": "龙",
+      "date": "2024-02-18",
+      "tags": [
+        "实物雕塑"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2024-02-long/meta.json",
+      "featured": true
+    },
+    {
+      "id": "2023-11-fxm",
+      "title": "风消鸣",
+      "date": "2023-11-18",
+      "tags": [
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2023-11-fxm/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2022-09-sen",
+      "title": "森",
+      "date": "2022-09-15",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2022-09-sen/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2022-05-mdzw",
+      "title": "梦地之舞",
+      "date": "2022-05-02",
+      "tags": [
+        "视觉插画",
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2022-05-mdzw/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2021-08-em",
+      "title": "噩梦拜拜",
+      "date": "2021-08-17",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "与梦魇战斗",
+      "summary": "与梦魇战斗",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2021-08-em/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2021-03-ys",
+      "title": "游生",
+      "date": "2021-03-24",
+      "tags": [
+        "视觉插画",
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2021-03-ys/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2021-01-fl",
+      "title": "风来",
+      "date": "2021-01-10",
+      "tags": [
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2021-01-fl/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2020-02-nz",
+      "title": "脑子里有龙",
+      "date": "2020-02-22",
+      "tags": [
+        "视觉插画"
+      ],
+      "tagline": "哈哈哈哈",
+      "summary": "哈哈哈哈",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2020-02-nz/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2019-10-ls",
+      "title": "留神",
+      "date": "2019-10-28",
+      "tags": [
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2019-10-ls/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2019-09-yh",
+      "title": "宇航",
+      "date": "2019-09-28",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "一小片天气，停在一件外套和一段路之间。",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2019-09-yh/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2019-09-bw",
+      "title": "波纹",
+      "date": "2019-09-25",
+      "tags": [
+        "随笔练习"
+      ],
+      "tagline": "",
+      "summary": "照料与控制之间，是否存在一条柔软的边界？",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2019-09-bw/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2019-08-qg",
+      "title": "弃稿",
+      "date": "2019-08-21",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "准备离开的人，似乎总会在门边多停留一会儿。",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2019-08-qg/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2017-10-jx",
+      "title": "即兴",
+      "date": "2017-10-25",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "关于远处、草地，以及那些没有被说出口的事。",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2017-10-jx/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2017-10-ji",
+      "title": "棘",
+      "date": "2017-10-06",
+      "tags": [
+        "随笔练习",
+        "视觉插画"
+      ],
+      "tagline": "",
+      "summary": "风看不见，但它改变了衣角、头发，也改变了一个瞬间的方向。",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2017-10-ji/meta.json",
+      "featured": false
+    },
+    {
+      "id": "2012-05-j",
+      "title": "集",
+      "date": "2012-05-10",
+      "tags": [
+        "视觉插画"
+      ],
+      "tagline": "我们所处的集",
+      "summary": "我们所处的集",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "meta": "works/2012-05-j/meta.json",
+      "featured": false
+    }
+  ]
 }

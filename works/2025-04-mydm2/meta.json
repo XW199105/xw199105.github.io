@@ -20,7 +20,7 @@
     "10.jpg",
     "11.jpg"
   ],
-  "featured": false,
+  "featured": true,
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1,
@@ -33,5 +33,11 @@
     "x": -1,
     "y": -0.1778
   },
-  "updated": "2026-10-17"
+  "carouselCropM": {
+    "src": "08.jpg",
+    "zoom": 1,
+    "x": -0.52,
+    "y": -1
+  },
+  "updated": "2026-10-18"
 }
