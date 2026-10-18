@@ -303,7 +303,8 @@
     }
 
     // 两张图叠在一起做交叉淡入：新图淡入的同时旧图淡出，不会闪白也不会跳
-    function showImage(src, crop) {
+    // instant=true（手动滑动翻页）时不淡入，直接切换
+    function showImage(src, crop, instant) {
       var next = layers[1 - cur];
       var my = ++token;
       function swap() {
@@ -313,6 +314,10 @@
         // 把刚点亮的那层又熄灭，出现空白
         next.onload = null;
         next.onerror = null;
+        if (instant) {
+          frame.classList.add('no-fade');
+          setTimeout(function () { frame.classList.remove('no-fade'); }, 80);
+        }
         next.classList.add('on');
         layers[cur].classList.remove('on');
         cur = 1 - cur;
@@ -330,7 +335,7 @@
       }).join('');
     }
     var textGuard = null;
-    function setText(w) {
+    function setText(w, instant) {
       var line = w.tagline || w.summary || firstSentence(w.description) || '';
       var nChars = Array.from(String(w.title || '')).length;
       title.setAttribute('aria-label', w.title);      // 读屏仍然读整句
@@ -344,26 +349,31 @@
       // 安全网：最长一段动画是「逐字错开 + 0.9s 时长」，超时就强制显示
       text.classList.remove('chars-done');
       clearTimeout(textGuard);
+      if (instant) {
+        // 手动滑动翻页：不播逐字动画，直接显示
+        text.classList.add('chars-done');
+        return;
+      }
       textGuard = setTimeout(function () { text.classList.add('chars-done') },
         Math.max(1800, nChars * 60 + 900 + 400));
     }
-    // 手机宽度用竖版取景（3:4），桌面用横版
+    // 手机宽度用竖版取景（9:16），桌面用横版
     var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
     function cropFor(w) {
       var m = w.carouselCropM, d = w.carouselCrop;
       return (mobileMQ.matches && m) ? m : d;
     }
-    function paint() {
+    function paint(instant) {
       var w = list[idx];
-      setText(w);
+      setText(w, instant);
       var crop = cropFor(w);
       var heroImg = (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
-      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop);
+      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop, instant);
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
       renderDots();
     }
-    function go(n) { idx = (n + list.length) % list.length; paint(); }
+    function go(n, instant) { idx = (n + list.length) % list.length; paint(instant); }
 
     // 屏幕宽度跨过断点（横竖屏切换）时，重新套用当前这张的取景
 
@@ -396,48 +406,55 @@
     });
 
     /* ---------------- 滑动翻页（手机滑、桌面按住拖） ---------------- */
-    var dragX = 0, dragY = 0, dragging = false, isDrag = false, suppressClick = false;
-    var THRESH = 42;          // 横向拖过这么多像素就翻页
-    var MAX_LEAN = 28;        // 拖动时最多跟手位移
+    // 手感：不跟手、不播动画，横向划过一小段就立刻换图（像相册翻页）
+    var dragX = 0, dragY = 0, dragT = 0, dragging = false, isDrag = false, suppressClick = false;
+    var THRESH = 18;          // 横向拖过这么多像素就翻页（越小越灵敏）
+    var THRESH_VEL = 0.35;    // 或者快速划动（px/ms）也算
 
-    function clampLean(dx) {
-      return Math.max(-MAX_LEAN, Math.min(MAX_LEAN, dx * 0.22));
-    }
     frame.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (list.length < 2) return;
       dragging = true; isDrag = false;
       dragX = e.clientX; dragY = e.clientY;
+      dragT = Date.now();
     });
     frame.addEventListener('pointermove', function (e) {
       if (!dragging) return;
       var dx = e.clientX - dragX, dy = e.clientY - dragY;
-      if (!isDrag && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+      if (!isDrag && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
         isDrag = true;
-        frame.style.transition = 'none';
         try { frame.setPointerCapture(e.pointerId); } catch (err) {}
       }
-      if (isDrag) frame.style.transform = 'translateX(' + clampLean(dx) + 'px)';
+      // 划得够远就直接翻，不等松手 —— 手感更干脆
+      if (isDrag && Math.abs(dx) > THRESH * 1.6 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) go(idx + 1, true); else go(idx - 1, true);
+        schedule();
+        stopDrag();
+      }
     });
+    function stopDrag() {
+      dragging = false; isDrag = false;
+      suppressClick = true;
+      setTimeout(function () { suppressClick = false; }, 400);
+    }
     function endDrag(e, cancelled) {
       if (!dragging) return;
-      dragging = false;
       var dx = e.clientX - dragX, dy = e.clientY - dragY;
-      frame.style.transition = 'transform .26s cubic-bezier(.2,.72,.28,1)';
-      frame.style.transform = '';
-      setTimeout(function () { frame.style.transition = ''; }, 300);
-      if (!cancelled && isDrag && Math.abs(dx) > THRESH && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) go(idx + 1); else go(idx - 1);
+      var dt = Math.max(1, Date.now() - dragT);
+      var fast = Math.abs(dx) / dt > THRESH_VEL;
+      var horiz = Math.abs(dx) > Math.abs(dy);
+      if (!cancelled && horiz && (Math.abs(dx) >= THRESH || fast) && Math.abs(dx) > 6) {
+        if (dx < 0) go(idx + 1, true); else go(idx - 1, true);
         schedule();
-        suppressClick = true;
-        setTimeout(function () { suppressClick = false; }, 450);
+        stopDrag();
+      } else {
+        dragging = false; isDrag = false;
       }
-      isDrag = false;
     }
     frame.addEventListener('pointerup', function (e) { endDrag(e, false); });
     frame.addEventListener('pointercancel', function (e) { endDrag(e, true); });
     frame.addEventListener('pointerleave', function (e) { if (dragging) endDrag(e, true); });
-    // 拖完别顺手把链接点开
+    // 划完别顺手把链接点开
     frame.addEventListener('click', function (e) {
       if (suppressClick) { e.preventDefault(); e.stopPropagation(); }
     }, true);

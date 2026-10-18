@@ -105,7 +105,7 @@ img{max-width:100%}
   .feature-dots{gap:7px}
   .hero{padding-top:28px}
   /* 手机上轮播换竖版取景 3:4 */
-  .feature-frame{aspect-ratio:9/16;max-width:none}
+  .feature-frame{aspect-ratio:3/5;max-width:none}
 }
 
 /* ---------- grids ---------- */
@@ -408,7 +408,7 @@ img{max-width:100%}
 /* ===== 首页轮播（新）：整宽居中，标题在圆点下方，副标题跟在右边 ===== */
 .hero{padding:14px 0 4vh}
 .feature{
-  display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;
   grid-template-columns:none;justify-content:initial;
 }
 .feature-visual{order:1;width:100%;min-width:0}
@@ -431,12 +431,12 @@ img{max-width:100%}
 
 @media(max-width:640px){
   .hero{display:block;min-height:0;padding:8px 0 24px}
-  .feature{gap:10px}
-  .feature-frame{aspect-ratio:9/16;max-width:100%}
+  .feature{gap:2px}
+  .feature-frame{aspect-ratio:3/5;max-width:100%}
   .feature-copy h1{font-size:18px}
   .feature-copy p{font-size:11px}
   .feature-text{gap:30px}
-  .feature-controls{margin-top:10px}
+  .feature-controls{margin-top:8px}
 }
 
 /* 作品详情：标签和年份并成一行 */
@@ -456,3 +456,6 @@ img{max-width:100%}
 /* 轮播滑动翻页：竖向仍可滚动页面，横向由 JS 接管（回弹动画由 JS 控制） */
 .feature-frame{touch-action:pan-y;cursor:grab}
 .feature-frame:active{cursor:grabbing}
+
+/* 手动滑动翻页：不做淡入，直接换图 */
+.feature-frame.no-fade .feat-img{transition:none!important}
