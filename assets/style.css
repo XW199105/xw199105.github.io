@@ -342,7 +342,9 @@ img{max-width:100%}
 .intro-frame{display:flex;flex-direction:column;align-items:stretch;width:max-content;gap:11px;position:relative}
 .intro-mark{position:relative;display:flex;align-items:center;justify-content:center;gap:.04em;font-family:var(--logo);font-size:clamp(34px,7vw,66px);font-weight:400;letter-spacing:.16em;margin-right:-.16em;overflow:hidden;
   /* 上下留出跳动空间：内边距撑大裁剪框，负外边距抵消，视觉位置不变 */
-  --jump:clamp(16px,3vw,26px);padding-block:var(--jump);margin-block:calc(var(--jump) * -1)}
+  --jump:clamp(16px,3vw,26px);padding-block:var(--jump);margin-block:calc(var(--jump) * -1);
+  /* Lot 字体上伸部比下伸部长，行盒里的字看起来偏下；按字身大小补偿回来，让上下留白相等 */
+  transform:translateY(calc(var(--ink-fix,.068em) * -1))}
 /* 五个字母：各自不同的倾斜角度入场，落位时轻微回弹，模糊→清晰 */
 .intro-mark span{display:inline-block;opacity:0;transform:translateY(36px) rotate(var(--r,0deg)) scale(1.1);filter:blur(8px);
   animation:introLetter .84s cubic-bezier(.16,.86,.28,1) var(--d,0s) forwards}
