@@ -335,34 +335,51 @@
         return '<span class="ch" style="--i:' + i + '">' + (ch === ' ' ? '&nbsp;' : esc(ch)) + '</span>';
       }).join('');
     }
-    var textGuard = null;
+    var textGuard = null, textSwapTimer = null;
+    /* 换图时的先后顺序：
+       ① 旧标题先淡出（240ms）
+       ② 图片开始淡入（CSS .9s）
+       ③ 标题/白底再进场，字比图慢一点点，读完图片才看到文字 */
     function setText(w, instant) {
       var line = w.tagline || w.summary || firstSentence(w.description) || '';
       var nChars = Array.from(String(w.title || '')).length;
-      title.setAttribute('aria-label', w.title);      // 读屏仍然读整句
-      title.innerHTML = splitChars(w.title);           // 新元素 → 动画自动从头播
-      desc.textContent = line;
-      desc.style.display = line ? '' : 'none';
-      var panel = text.parentNode;
-      if (panel && panel.classList && panel.classList.contains('feature-copy')) {
-        panel.classList.remove('cap-play');
-        void panel.offsetHeight;                       // 强制重排，让动画从头开始
-        if (!instant) panel.classList.add('cap-play'); // 滑动瞬时切换就不播
+      clearTimeout(textSwapTimer);
+
+      function applyText() {
+        title.setAttribute('aria-label', w.title);      // 读屏仍然读整句
+        title.innerHTML = splitChars(w.title);           // 新元素 → 动画自动从头播
+        desc.textContent = line;
+        desc.style.display = line ? '' : 'none';
+        var panel = text.parentNode;
+        if (panel && panel.classList && panel.classList.contains('feature-copy')) {
+          panel.classList.remove('cap-play');
+          void panel.offsetHeight;                       // 强制重排，让动画从头开始
+          if (!instant) panel.classList.add('cap-play'); // 滑动瞬时切换就不播
+        }
+        // 简介是同一个 <p>，不重建的话动画只播一次；这里手动重启
+        desc.style.animation = 'none';
+        void desc.offsetHeight;                          // 强制重排，让 none 生效
+        desc.style.animation = '';
+        // 安全网：最长一段动画是「逐字错开 + 0.9s 时长」，超时就强制显示
+        text.classList.remove('chars-done');
+        clearTimeout(textGuard);
+        if (instant) {
+          // 手动滑动翻页：不播逐字动画，直接显示
+          text.classList.add('chars-done');
+          return;
+        }
+        textGuard = setTimeout(function () { text.classList.add('chars-done') },
+          Math.max(1800, nChars * 60 + 900 + 400));
       }
-      // 简介是同一个 <p>，不重建的话动画只播一次；这里手动重启
-      desc.style.animation = 'none';
-      void desc.offsetHeight;                          // 强制重排，让 none 生效
-      desc.style.animation = '';
-      // 安全网：最长一段动画是「逐字错开 + 0.9s 时长」，超时就强制显示
-      text.classList.remove('chars-done');
-      clearTimeout(textGuard);
-      if (instant) {
-        // 手动滑动翻页：不播逐字动画，直接显示
-        text.classList.add('chars-done');
-        return;
-      }
-      textGuard = setTimeout(function () { text.classList.add('chars-done') },
-        Math.max(1800, nChars * 60 + 900 + 400));
+
+      if (instant) { text.classList.remove('is-out'); applyText(); return }
+
+      // 先把旧标题淡掉，等它退场后再换字、再进场
+      text.classList.add('is-out');
+      textSwapTimer = setTimeout(function () {
+        text.classList.remove('is-out');
+        applyText();
+      }, 240);
     }
     // 手机宽度用竖版取景（9:16），桌面用横版
     var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
@@ -703,8 +720,8 @@
 
   /* ---------------- 笔记详情 ---------------- */
     /* 笔记正文：优先用富文本 content.html，其次回落到 markdown */
-    var RICH_TAGS = { P:1, H2:1, H3:1, H4:1, BLOCKQUOTE:1, UL:1, OL:1, LI:1, STRONG:1, B:1, EM:1, I:1, U:1,
-      A:1, BR:1, IMG:1, FIGURE:1, FIGCAPTION:1, SPAN:1, DIV:1, HR:1 };
+    var RICH_TAGS = { P:1, H1:1, H2:1, H3:1, H4:1, BLOCKQUOTE:1, UL:1, OL:1, LI:1, STRONG:1, B:1, EM:1, I:1, U:1,
+      A:1, BR:1, IMG:1, VIDEO:1, IFRAME:1, SOURCE:1, FIGURE:1, FIGCAPTION:1, SPAN:1, DIV:1, HR:1 };
     function sanitizeRich(html) {
       var box = document.createElement('div');
       box.innerHTML = String(html || '');
@@ -713,7 +730,7 @@
           if (ch.nodeType === 3) return;
           if (ch.nodeType !== 1) { node.removeChild(ch); return; }
           var tag = ch.tagName.toUpperCase();
-          if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IFRAME' || tag === 'OBJECT' || tag === 'LINK' || tag === 'META') {
+          if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'OBJECT' || tag === 'LINK' || tag === 'META') {
             node.removeChild(ch); return;
           }
           walk(ch);
@@ -723,20 +740,39 @@
             node.replaceChild(frag, ch);
             return;
           }
-          if (tag === 'B') { var s = document.createElement('strong'); s.innerHTML = ch.innerHTML; ch.replaceWith(s); ch = s; }
-          else if (tag === 'I') { var e = document.createElement('em'); e.innerHTML = ch.innerHTML; ch.replaceWith(e); ch = e; }
+          function renameKeep(el, name){
+            var n2 = document.createElement(name);
+            n2.innerHTML = el.innerHTML;
+            Array.prototype.slice.call(el.attributes).forEach(function (a) { n2.setAttribute(a.name, a.value); });
+            el.replaceWith(n2);
+            return n2;
+          }
+          if (tag === 'B') { ch = renameKeep(ch, 'strong'); }
+          else if (tag === 'I') { ch = renameKeep(ch, 'em'); }
+          else if (tag === 'H1') { ch = renameKeep(ch, 'h2'); }
+          else if (tag === 'H4') { ch = renameKeep(ch, 'h3'); }
+
           var st = ch.getAttribute('style') || '';
           var ta = (st.match(/text-align\s*:\s*(left|center|right|justify)/i) || [])[1];
           var fc = (st.match(/color\s*:\s*(#[0-9a-f]{3,8}|rgba?\([^)]*\))/i) || [])[1];
           var fs = (st.match(/font-size\s*:\s*(\d{1,2}(?:\.\d+)?px)/i) || [])[1];
           var href = tag === 'A' ? (ch.getAttribute('href') || '') : '';
           var src = tag === 'IMG' ? (ch.getAttribute('src') || '') : '';
+            var vsrc = (tag === 'VIDEO' || tag === 'SOURCE' || tag === 'IFRAME') ? (ch.getAttribute('src') || '') : '';
+            if (vsrc && /^\/\//.test(vsrc)) vsrc = 'https:' + vsrc;
+            if (vsrc && /^http:\/\//i.test(vsrc)) vsrc = vsrc.replace(/^http:/i, 'https:');
+            var poster = tag === 'VIDEO' ? (ch.getAttribute('poster') || '') : '';
+            var vtype = tag === 'SOURCE' ? (ch.getAttribute('type') || '') : '';
+            var vFlags = tag === 'VIDEO' ? { loop: ch.hasAttribute('loop'), muted: ch.hasAttribute('muted'), autoplay: ch.hasAttribute('autoplay') } : null;
+            var dcls = tag === 'DIV' ? (ch.getAttribute('class') || '') : '';
           var cls = tag === 'FIGURE'
             ? (ch.getAttribute('class') || '').split(/\s+/).filter(function (c) {
                 return /^(fig-(25|50|75|100)|al-(left|center|right))$/.test(c);
               })
             : [];
           if (tag === 'IMG' && !/^(data:image\/|https?:\/\/|img\/)/i.test(src)) { node.removeChild(ch); return; }
+            if (tag === 'VIDEO' && vsrc && !/^(data:video\/|https?:\/\/|video\/)/i.test(vsrc)) { node.removeChild(ch); return; }
+            if (tag === 'SOURCE' && !/^(data:video\/|https?:\/\/|video\/)/i.test(vsrc)) { node.removeChild(ch); return; }
           Array.prototype.slice.call(ch.attributes).forEach(function (a) { ch.removeAttribute(a.name); });
           var keepStyle = [ta ? 'text-align:' + ta.toLowerCase() : '', fc ? 'color:' + fc : '', fs ? 'font-size:' + fs : ''].filter(Boolean).join(';');
           if (keepStyle) ch.setAttribute('style', keepStyle);
@@ -745,11 +781,38 @@
             if (/^https?:/i.test(href)) { ch.setAttribute('target', '_blank'); ch.setAttribute('rel', 'noopener'); }
           }
           if (tag === 'IMG') ch.setAttribute('src', src);
+            if (tag === 'VIDEO') {
+              if (vsrc) ch.setAttribute('src', vsrc);
+              ch.setAttribute('controls', '');
+              ch.setAttribute('playsinline', '');
+              ch.setAttribute('preload', 'metadata');
+              if (poster) ch.setAttribute('poster', poster);
+              if (vFlags.loop) ch.setAttribute('loop', '');
+              if (vFlags.muted) ch.setAttribute('muted', '');
+            }
+            if (tag === 'SOURCE') { ch.setAttribute('src', vsrc); if (/^video\//i.test(vtype)) ch.setAttribute('type', vtype); }
           if (tag === 'FIGURE') {
             if (!cls.some(function (c) { return c.indexOf('fig-') === 0; })) cls.push('fig-100');
             if (!cls.some(function (c) { return c.indexOf('al-') === 0; })) cls.push('al-left');
+            var fTa = ((ch.getAttribute('style') || '').match(/text-align\s*:\s*(left|center|right|justify)/i) || [])[1];
             ch.setAttribute('class', cls.join(' '));
+            if (fTa) ch.setAttribute('style', 'text-align:' + fTa.toLowerCase());
           }
+            if (tag === 'IFRAME') {
+              /* 只放行白名单域名的 https 播放器 */
+              var IFRAME_OK=/(^|\.)(bilibili\.com|youtube\.com|youtu\.be|vimeo\.com|youku\.com|qq\.com|ixigua\.com|douyin\.com|weibo\.com|acfun\.cn)$/i;
+              var host = '';
+              try { var uu = new URL(vsrc); host = uu.hostname; if (uu.protocol !== 'https:') host = ''; } catch (e) { host = ''; }
+              if (!host || !IFRAME_OK.test(host)) { node.removeChild(ch); return; }
+              ch.setAttribute('src', vsrc);
+              ch.setAttribute('allowfullscreen', '');
+              ch.setAttribute('frameborder', '0');
+              ch.setAttribute('scrolling', 'no');
+              ch.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture');
+            }
+            if (tag === 'DIV' && /(^|\s)video-embed(\s|$)/.test(dcls)) {
+              ch.setAttribute('class', 'video-embed');
+            }
         });
       })(box);
       return box.innerHTML;
@@ -786,9 +849,9 @@
           var probe0=document.createElement('div'); probe0.innerHTML=rich;
           var first0=probe0.firstElementChild;
           if(first0&&/^H[23]$/.test(first0.tagName)&&first0.textContent.trim()===String(title).trim()) first0.remove();
-          $$('img',probe0).forEach(function(im){
+          $$('img,video,source',probe0).forEach(function(im){
             var s=im.getAttribute('src')||'';
-            if(!/^(https?:|data:|\/)/i.test(s)) im.setAttribute('src', url(base + s));
+            if(s && !/^(https?:|data:|blob:|\/)/i.test(s)) im.setAttribute('src', url(base + s));
           });
           bodyHtml = '<div class="note-rich">' + probe0.innerHTML + '</div>';
         } else {
