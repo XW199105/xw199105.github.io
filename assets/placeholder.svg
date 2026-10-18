@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="675" viewBox="0 0 900 675" role="img" aria-label="图片占位">
+  <rect width="900" height="675" fill="#eeede8"/>
+  <path d="M0 510 Q180 455 330 505 T650 490 T900 500 V675 H0Z" fill="#dedbd3"/>
+  <circle cx="450" cy="250" r="100" fill="#c8c4ba"/>
+  <path d="M340 530 Q360 365 450 355 Q540 365 560 530Z" fill="#b4afa4"/>
+  <text x="450" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" letter-spacing="7" fill="#77746e">VVXIE</text>
+</svg>
