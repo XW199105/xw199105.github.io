@@ -5,7 +5,7 @@
   "tags": [
     "实物雕塑"
   ],
-  "tagline": "画一笔的流动",
+  "tagline": "把我画给江河与山川",
   "description": "",
   "gallery": [
     "01.jpg",
@@ -36,7 +36,7 @@
   },
   "carouselCropM": {
     "src": "01.jpg",
-    "zoom": 1,
+    "zoom": 1.01,
     "x": 0.28,
     "y": 1
   },

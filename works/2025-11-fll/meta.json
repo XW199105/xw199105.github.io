@@ -5,7 +5,7 @@
   "tags": [
     "实物雕塑"
   ],
-  "tagline": "",
+  "tagline": "慢行的归途",
   "description": "",
   "gallery": [
     "01.jpg",
@@ -36,7 +36,7 @@
   "carouselCropM": {
     "src": "01.jpg",
     "zoom": 1,
-    "x": -1,
+    "x": 0.0014,
     "y": -1
   },
   "updated": "2026-10-18"
