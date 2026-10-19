@@ -741,7 +741,8 @@
   /* ---------------- 笔记详情 ---------------- */
     /* 笔记正文：优先用富文本 content.html，其次回落到 markdown */
     var RICH_TAGS = { P:1, H1:1, H2:1, H3:1, H4:1, BLOCKQUOTE:1, UL:1, OL:1, LI:1, STRONG:1, B:1, EM:1, I:1, U:1,
-      A:1, BR:1, IMG:1, VIDEO:1, IFRAME:1, SOURCE:1, FIGURE:1, FIGCAPTION:1, SPAN:1, DIV:1, HR:1 };
+      A:1, BR:1, IMG:1, VIDEO:1, IFRAME:1, SOURCE:1, FIGURE:1, FIGCAPTION:1, SPAN:1, DIV:1, HR:1,
+        TABLE:1, THEAD:1, TBODY:1, TR:1, TD:1, TH:1 };
     function sanitizeRich(html) {
       var box = document.createElement('div');
       box.innerHTML = String(html || '');
@@ -776,6 +777,8 @@
           var ta = (st.match(/text-align\s*:\s*(left|center|right|justify)/i) || [])[1];
           var fc = (st.match(/color\s*:\s*(#[0-9a-f]{3,8}|rgba?\([^)]*\))/i) || [])[1];
           var fs = (st.match(/font-size\s*:\s*(\d{1,2}(?:\.\d+)?px)/i) || [])[1];
+        var ti = (st.match(/text-indent\s*:\s*(-?\d{1,3}px)/i) || [])[1];
+        var pl = (st.match(/padding-left\s*:\s*(\d{1,3}px)/i) || [])[1];
           var href = tag === 'A' ? (ch.getAttribute('href') || '') : '';
           var src = tag === 'IMG' ? (ch.getAttribute('src') || '') : '';
             var vsrc = (tag === 'VIDEO' || tag === 'SOURCE' || tag === 'IFRAME') ? (ch.getAttribute('src') || '') : '';
@@ -794,7 +797,7 @@
             if (tag === 'VIDEO' && vsrc && !/^(data:video\/|https?:\/\/|video\/)/i.test(vsrc)) { node.removeChild(ch); return; }
             if (tag === 'SOURCE' && !/^(data:video\/|https?:\/\/|video\/)/i.test(vsrc)) { node.removeChild(ch); return; }
           Array.prototype.slice.call(ch.attributes).forEach(function (a) { ch.removeAttribute(a.name); });
-          var keepStyle = [ta ? 'text-align:' + ta.toLowerCase() : '', fc ? 'color:' + fc : '', fs ? 'font-size:' + fs : ''].filter(Boolean).join(';');
+        var keepStyle = [ta ? 'text-align:' + ta.toLowerCase() : '', fc ? 'color:' + fc : '', fs ? 'font-size:' + fs : '', ti ? 'text-indent:' + ti : '', pl ? 'padding-left:' + pl : ''].filter(Boolean).join(';');
           if (keepStyle) ch.setAttribute('style', keepStyle);
           if (tag === 'A' && /^(https?:\/\/|mailto:|\/|\.\/|#)/i.test(href)) {
             ch.setAttribute('href', href);
@@ -833,6 +836,9 @@
             if (tag === 'DIV' && /(^|\s)video-embed(\s|$)/.test(dcls)) {
               ch.setAttribute('class', 'video-embed');
             }
+            if (tag === 'DIV' && /(^|\s)img-row(\s|$)/.test(dcls)) {
+              ch.setAttribute('class', 'img-row');
+            }
         });
       })(box);
       return box.innerHTML;
@@ -864,7 +870,140 @@
         var bodyHtml;
         if (richHtml) {
           // 富文本笔记：标题永远是 data 里的标题，正文用清洗过的 HTML
+      /* 旧内容里常见「figure 套 figure」「图注写成 figure」，间距忽大忽小就是它；
+         这里在渲染前统一整理成 figure > img + figcaption（不改文件） */
+      /* 只修「正文被误塞进图注」这种坏结构：没有图片/视频的 figure 拆回 <p> */
+      function repairFigures(root) {
+        if (!root) return;
+        Array.prototype.slice.call(root.querySelectorAll('figcaption')).forEach(function (c) {
+          var txt = (c.textContent || '').trim();
+          var fig = c.closest('figure');
+          if (!txt) { c.remove(); return; }
+          if (txt.length > 40) {
+            var p2 = document.createElement('p');
+            p2.innerHTML = c.innerHTML;
+            if (fig) fig.parentNode.insertBefore(p2, fig.nextSibling); else c.replaceWith(p2);
+            c.remove();
+          }
+        });
+        /* 裸文字没有块级祖先，text-align 无处落点 → 包成段落 */
+        Array.prototype.slice.call(root.childNodes).forEach(function (n) {
+          if (n.nodeType === 3) {
+            if (!n.textContent.trim()) { n.remove(); return; }
+            var p = document.createElement('p');
+            root.insertBefore(p, n);
+            p.appendChild(n);
+          }
+        });
+        /* 图片和文字彻底分开：段落里不许出现块级元素/裸图片，图块里不许有正文，图块不套图块 */
+        var RT_BLOCK = /^(FIGURE|DIV|UL|OL|TABLE|P|H1|H2|H3|H4|BLOCKQUOTE)$/;
+        Array.prototype.slice.call(root.querySelectorAll('figure')).forEach(function (fig) {
+          var out = [];
+          Array.prototype.slice.call(fig.childNodes).forEach(function (n) {
+            if (n.nodeType === 3) { if (n.textContent.trim()) out.push(n); else n.remove(); return; }
+            if (n.nodeType !== 1) { n.remove(); return; }
+            if (/^(IMG|VIDEO|IFRAME|SOURCE|FIGCAPTION)$/.test(n.tagName)) return;
+            out.push(n);
+          });
+          if (out.length) {
+            var pOut = document.createElement('p');
+            out.forEach(function (n) { pOut.appendChild(n); });
+            fig.parentNode.insertBefore(pOut, fig.nextSibling);
+          }
+        });
+        Array.prototype.slice.call(root.querySelectorAll('figure')).reverse().forEach(function (fig) {
+          Array.prototype.slice.call(fig.children).forEach(function (c) {
+            if (c.tagName === 'FIGURE') fig.parentNode.insertBefore(c, fig.nextSibling);
+          });
+        });
+        Array.prototype.slice.call(root.querySelectorAll('p,li,h2,h3,h4,blockquote')).forEach(function (block) {
+          var bad = Array.prototype.slice.call(block.childNodes).filter(function (n) {
+            if (n.nodeType !== 1) return false;
+            return n.tagName === 'IMG' || RT_BLOCK.test(n.tagName);
+          });
+          if (!bad.length) return;
+          var par = block.parentNode;
+          if (!par) return;
+          var tag = block.tagName.toLowerCase();
+          var buf = [], seq = [];
+          function flush() {
+            var has = buf.some(function (n) { return n.nodeType === 1 || n.textContent.trim(); });
+            if (has) {
+              var p2 = document.createElement(tag);
+              var st = block.getAttribute('style');
+              if (st) p2.setAttribute('style', st);
+              buf.forEach(function (n) { p2.appendChild(n); });
+              seq.push(p2);
+            }
+            buf = [];
+          }
+          Array.prototype.slice.call(block.childNodes).forEach(function (n) {
+            var isBlock = n.nodeType === 1 && (n.tagName === 'IMG' || RT_BLOCK.test(n.tagName));
+            if (!isBlock) { buf.push(n); return; }
+            flush();
+            if (n.tagName === 'IMG') {
+              var fg = document.createElement('figure');
+              fg.className = 'fig-100 al-left';
+              fg.appendChild(n);
+              seq.push(fg);
+            } else {
+              seq.push(n);
+            }
+          });
+          flush();
+          seq.forEach(function (el) { par.insertBefore(el, block); });
+          block.remove();
+        });
+        /* 并排图容器里只留图片 */
+        Array.prototype.slice.call(root.querySelectorAll('.img-row')).forEach(function (row) {
+          Array.prototype.slice.call(row.children).forEach(function (c) {
+            if (c.tagName === 'IMG') return;
+            if (c.tagName === 'BR') { c.remove(); return; }
+            row.parentNode.insertBefore(c, row.nextSibling);
+          });
+          if (!row.querySelector('img')) row.remove();
+        });
+        /* WPS/Word 粘来的内容常被 div 包着，块间距会算不准；这里拆掉，只留并排图和视频容器 */
+        Array.prototype.slice.call(root.querySelectorAll('div')).forEach(function (d) {
+          var cls = d.getAttribute('class') || '';
+          if (/(^|\s)(img-row|video-embed)(\s|$)/.test(cls)) return;
+          var par = d.parentNode;
+          while (d.firstChild) par.insertBefore(d.firstChild, d);
+          d.remove();
+        Array.prototype.slice.call(root.children).forEach(function (n) { if (n.tagName === 'BR') n.remove(); });
+        });
+        /* 图片块里不该有正文：把 img/video/iframe/figcaption 之外的内容挪到图后面 */
+        Array.prototype.slice.call(root.querySelectorAll('figure')).forEach(function (fig) {
+          var out = [];
+          Array.prototype.slice.call(fig.childNodes).forEach(function (n) {
+            if (n.nodeType === 3) { if (n.textContent.trim()) out.push(n); else n.remove(); return; }
+            if (n.nodeType !== 1) { n.remove(); return; }
+            var t = n.tagName;
+            if (t === 'IMG' || t === 'VIDEO' || t === 'IFRAME' || t === 'SOURCE' || t === 'FIGCAPTION') return;
+            out.push(n);
+          });
+          if (!out.length) return;
+          var p3 = document.createElement('p');
+          out.forEach(function (n) { p3.appendChild(n); });
+          fig.parentNode.insertBefore(p3, fig.nextSibling);
+        });
+        Array.prototype.slice.call(root.querySelectorAll('figure')).reverse().forEach(function (fig) {
+          if (fig.querySelector('img,video,iframe')) return;
+          Array.prototype.slice.call(fig.querySelectorAll('figcaption')).forEach(function (c) {
+            while (c.firstChild) c.parentNode.insertBefore(c.firstChild, c);
+            c.remove();
+          });
+          var p = document.createElement('p');
+          p.innerHTML = fig.innerHTML;
+          var st = (fig.getAttribute('style') || '').match(/text-align\s*:\s*(left|center|right)/i);
+          var am = (fig.getAttribute('class') || '').match(/al-(left|center|right)/);
+          if (st) p.setAttribute('style', 'text-align:' + st[1].toLowerCase());
+          else if (am && am[1] !== 'left') p.setAttribute('style', 'text-align:' + am[1]);
+          fig.replaceWith(p);
+        });
+      }
           var rich = sanitizeRich(richHtml);
+          { var _pb = document.createElement('div'); _pb.innerHTML = rich; repairFigures(_pb); rich = _pb.innerHTML; }
           startsWithHeading = false;   // 富文本：标题照常显示（正文里重名的第一个标题已去掉）
           var probe0=document.createElement('div'); probe0.innerHTML=rich;
           var first0=probe0.firstElementChild;

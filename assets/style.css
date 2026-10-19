@@ -41,8 +41,8 @@ img{max-width:100%}
     padding:14px 0;gap:14px}
   .topbar-inner{display:flex;align-items:center}
   /* 菜单始终显示，不做二级菜单 */
-  .nav{display:flex;flex-wrap:nowrap;gap:15px;margin:0}
-  .nav a,.nav button{font-size:13.5px;padding:6px 0}
+  .nav{display:flex;flex-wrap:nowrap;gap:11px;margin:0}
+  .nav a,.nav button{font-size:13px;padding:6px 0;white-space:nowrap}
 }
 
 /* ---------- page shell ---------- */
@@ -184,12 +184,12 @@ img{max-width:100%}
 
 /* 笔记详情：富文本正文（编辑器产出的 HTML） */
 .note-rich{font-size:14px;line-height:2.1;color:#4a4a4a}
-.note-rich h2{font:300 clamp(20px,2.4vw,26px)/1.5 var(--heiti-light);margin:38px 0 12px;color:#3f3f3f}
-.note-rich h3{font:300 clamp(16px,1.8vw,19px)/1.6 var(--heiti-light);margin:28px 0 10px;color:#3f3f3f}
-.note-rich p{margin:0 0 18px}
-.note-rich ul,.note-rich ol{margin:0 0 18px;padding-left:24px}
-.note-rich li{margin:6px 0}
-.note-rich blockquote{margin:0 0 20px;padding:2px 0 2px 18px;border-left:2px solid var(--line);color:#5f6b69}
+.note-rich h2{font:300 clamp(20px,2.4vw,26px)/1.5 var(--heiti-light);margin:5px 0;color:#3f3f3f}
+.note-rich h3{font:300 clamp(16px,1.8vw,19px)/1.6 var(--heiti-light);margin:5px 0;color:#3f3f3f}
+.note-rich p{margin:0 0 5px}
+.note-rich ul,.note-rich ol{margin:0 0 5px;padding-left:24px}
+.note-rich li{margin:5px 0}
+.note-rich blockquote{margin:0 0 5px;padding:2px 0 2px 18px;border-left:2px solid var(--line);color:#5f6b69}
 .note-rich a{color:#3f3f3f;border-bottom:1px solid var(--line);text-decoration:none}
 .note-rich a:hover{border-bottom-color:#3f3f3f}
 .note-rich strong{font-weight:600;color:#3f3f3f}
@@ -202,7 +202,7 @@ img{max-width:100%}
 .note-rich figure.al-left img{margin-left:0;margin-right:auto}
 .note-rich figure.al-center img{margin-left:auto;margin-right:auto}
 .note-rich figure.al-right img{margin-left:auto;margin-right:0}
-.note-rich figcaption{font-size:11.5px;color:#929a98;margin-top:10px;line-height:1.8;text-align:center}
+.note-rich figcaption{font-size:13px;color:#6f7776;margin-top:5px;line-height:1.7;text-align:center}
 @media(max-width:760px){
   .note-rich figure.fig-25 img,.note-rich figure.fig-50 img{width:100%}
 }
@@ -563,3 +563,28 @@ body[data-page="home"] .footer{margin-top:20px}
   position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
 }
 .note-rich figure:has(.video-embed){max-width:min(100%,880px)}
+
+
+/* 笔记详情：所有块间距统一 5px；要留白就自己隔一行（空段落会照常占一行） */
+.note-rich figure{margin:5px 0}
+/* 真正空的段落不占位（编辑器自动补的占位符，存的时候会被去掉） */
+.note-rich p:empty,
+.note-rich p.sp{display:none}
+/* 图注 / 连续图片 / 并排图：同样 5px */
+.note-rich figure + figure{margin-top:5px}
+
+/* 图注：贴在图片下面 */
+.note-rich figcaption{font-size:13px;line-height:1.7;color:#6f7776;text-align:center;margin:5px 0 0}
+.note-rich figure.al-left figcaption{text-align:left}
+.note-rich figure.al-right figcaption{text-align:right}
+
+/* 并排图：一行里放多张图，宽度自动均分；删掉一张，剩下的自动变宽 */
+.note-rich .img-row{display:flex;align-items:center;gap:5px;margin:5px 0}
+.note-rich .img-row img{flex:1 1 0;min-width:0;width:0;height:auto;display:block;background:var(--soft);border-radius:2px}
+.note-rich .img-row + figure,.note-rich figure + .img-row{margin-top:5px}
+
+/* 表格（Word 导入的表格也走这个样式） */
+.note-rich table{width:100%;border-collapse:collapse;margin:5px 0;font-size:13px}
+.note-rich th,.note-rich td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.note-rich th{background:rgba(0,0,0,.03);font-weight:400;color:#3f3f3f}
+
