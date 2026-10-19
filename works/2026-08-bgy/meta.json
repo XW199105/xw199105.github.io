@@ -19,12 +19,9 @@
     "x": 0.0552,
     "y": -1
   },
-  "carouselCrop": {
-    "src": "01.jpg",
-    "zoom": 1,
-    "x": 1,
-    "y": -0.7702
-  },
+  "carouselCrop": null,
   "carouselCropM": null,
-  "updated": "2026-10-18"
+  "carousel": null,
+  "carouselM": null,
+  "updated": "2026-10-19"
 }

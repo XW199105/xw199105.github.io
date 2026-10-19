@@ -395,10 +395,15 @@
       var m = w.carouselCropM, d = w.carouselCrop;
       return (mobileMQ.matches && m) ? m : d;
     }
+    /* 首页用工具烘焙好的轮播图（carousel.jpg / carousel-m.jpg），没有再退回 CSS 取景 */
+    function carouselFile(w) {
+      return mobileMQ.matches ? (w.carouselM || w.carousel) : (w.carousel || w.carouselM);
+    }
     function paint(instant) {
       var w = list[idx];
       var crop = cropFor(w);
-      var heroImg = (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
+      var baked = carouselFile(w);
+      var heroImg = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
       // 先让旧标题淡出，拿到「图片显示后」要执行的换字函数
       var showText = setText(w, instant);
       var textDone = false;
@@ -412,7 +417,7 @@
       }
       // 图片加载失败 / 太慢时，别让标题一直空着
       var slowGuard = setTimeout(doText, instant ? 0 : 3500);
-      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), crop, instant, doText);
+      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), baked ? null : crop, instant, doText);
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
       renderDots();
@@ -424,6 +429,7 @@
     function reapplyCrop() {
       var w = list[idx]; if (!w) return;
       var on = layers[1 - cur];
+      if (carouselFile(w)) { paint(true); return; }   // 有烘焙好的轮播图 → 直接换文件
       if (on && on.naturalWidth) applyFrameCrop(on, cropFor(w));
       else paint();
     }

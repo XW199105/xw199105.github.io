@@ -29,16 +29,18 @@
     "y": -0.8455
   },
   "carouselCrop": {
-    "src": "05.jpg",
+    "src": "02.jpg",
     "zoom": 1,
     "x": -1,
-    "y": -0.7527
+    "y": -0.7746
   },
   "carouselCropM": {
-    "src": "07.jpg",
-    "zoom": 2.5,
-    "x": 0.0652,
-    "y": -0.9383
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": 0.2867,
+    "y": 1
   },
-  "updated": "2026-10-18"
+  "carousel": "carousel.jpg",
+  "carouselM": "carousel-m.jpg",
+  "updated": "2026-10-19"
 }

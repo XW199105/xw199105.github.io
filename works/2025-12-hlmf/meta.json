@@ -17,10 +17,12 @@
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.97,
-    "panU": -0.0267,
-    "panV": 0.3889
+    "x": 0.0493,
+    "y": -0.7697
   },
   "carouselCrop": null,
   "carouselCropM": null,
-  "updated": "2026-10-18"
+  "carousel": null,
+  "carouselM": null,
+  "updated": "2026-10-19"
 }

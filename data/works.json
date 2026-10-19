@@ -1,9 +1,10 @@
 {
-  "updated": "2026-10-18",
+  "updated": "2026-10-19",
   "tags": [
     "视觉插画",
     "随笔练习",
     "实物雕塑",
+    "过程分享",
     "同人练习"
   ],
   "works": [
@@ -18,6 +19,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2024-02-long/meta.json",
       "featured": true
     },
@@ -32,6 +35,8 @@
       "summary": "把我画给江河与山川",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2026-06-hb/meta.json",
       "featured": true
     },
@@ -46,6 +51,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2026-08-bgy/meta.json",
       "featured": false
     },
@@ -60,6 +67,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2026-02-xi/meta.json",
       "featured": false
     },
@@ -75,6 +84,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2025-12-hlmf/meta.json",
       "featured": false
     },
@@ -89,6 +100,8 @@
       "summary": "一会儿安静地啃草，一会儿在草地里肆意撒欢",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2025-11-mf/meta.json",
       "featured": true
     },
@@ -103,6 +116,8 @@
       "summary": "慢行的归途",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2025-11-fll/meta.json",
       "featured": true
     },
@@ -118,6 +133,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2025-11-bj/meta.json",
       "featured": false
     },
@@ -132,6 +149,8 @@
       "summary": "聆听故事，在朦胧的梦中漫游",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2025-04-mydm2/meta.json",
       "featured": true
     },
@@ -146,6 +165,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2025-04-mydm1/meta.json",
       "featured": false
     },
@@ -160,6 +181,8 @@
       "summary": "驻足在此刻",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2024-03-zz/meta.json",
       "featured": true
     },
@@ -174,6 +197,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2023-11-fxm/meta.json",
       "featured": false
     },
@@ -189,6 +214,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2022-09-sen/meta.json",
       "featured": false
     },
@@ -204,6 +231,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2022-05-mdzw/meta.json",
       "featured": false
     },
@@ -219,6 +248,8 @@
       "summary": "与梦魇战斗",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2021-08-em/meta.json",
       "featured": false
     },
@@ -234,6 +265,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2021-03-ys/meta.json",
       "featured": false
     },
@@ -248,6 +281,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2021-01-fl/meta.json",
       "featured": false
     },
@@ -262,6 +297,8 @@
       "summary": "哈哈哈哈",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2020-02-nz/meta.json",
       "featured": false
     },
@@ -276,6 +313,8 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2019-10-ls/meta.json",
       "featured": false
     },
@@ -291,6 +330,8 @@
       "summary": "一小片天气，停在一件外套和一段路之间。",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2019-09-yh/meta.json",
       "featured": false
     },
@@ -305,6 +346,8 @@
       "summary": "照料与控制之间，是否存在一条柔软的边界？",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2019-09-bw/meta.json",
       "featured": false
     },
@@ -320,6 +363,8 @@
       "summary": "准备离开的人，似乎总会在门边多停留一会儿。",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2019-08-qg/meta.json",
       "featured": false
     },
@@ -335,6 +380,8 @@
       "summary": "关于远处、草地，以及那些没有被说出口的事。",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2017-10-jx/meta.json",
       "featured": false
     },
@@ -350,6 +397,8 @@
       "summary": "风看不见，但它改变了衣角、头发，也改变了一个瞬间的方向。",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2017-10-ji/meta.json",
       "featured": false
     },
@@ -364,6 +413,8 @@
       "summary": "我们所处的集",
       "cover": "cover.jpg",
       "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
       "meta": "works/2012-05-j/meta.json",
       "featured": false
     }
