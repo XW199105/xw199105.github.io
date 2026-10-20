@@ -52,6 +52,7 @@
     box.classList.add('has-skel');
     var d = document.createElement('span');
     d.className = 'skel';
+    d.setAttribute('data-auto', '1');
     d.setAttribute('aria-hidden', 'true');
     d.innerHTML = '<i></i><i></i><i></i>';
     box.appendChild(d);
@@ -61,7 +62,7 @@
     im.setAttribute('data-ok', '1');
     var box = im.parentElement;
     if (!box) return;
-    var d = box.querySelector(':scope > .skel');
+    var d = box.querySelector(':scope > .skel[data-auto]');
     if (d) d.remove();
     /* 容器里所有图片都好了才去掉 has-skel */
     var left = [].filter.call(box.querySelectorAll('img'), function (x) { return !x.getAttribute('data-ok'); });
@@ -307,6 +308,7 @@
       '<div class="feature-visual" id="feature-visual">' +
         '<a class="feature-frame" id="feature-frame" href="#">' +
           '<img class="feat-img on" alt=""><img class="feat-img" alt="">' +
+          '<span class="skel" aria-hidden="true">' + '<i></i><i></i><i></i>' + '</span>' +
           // 标题压在图片左下角，垫一层透明白底
           '<div class="feature-copy"><div class="feature-text" id="feature-text">' +
             '<h1 id="feature-title"></h1><p id="feature-desc"></p>' +
@@ -456,7 +458,7 @@
       var crop = cropFor(w);
       var baked = carouselFile(w);
       var heroImg = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
-      /* 标题不再等图片：图片在后台加载，标题照常轮播（图加载完自己淡入） */
+      /* 先把旧标题淡出，等新图真的显示出来再换字（保证标题与图片一致） */
       var showText = setText(w, instant);
       var textDone = false;
       var myPaint2 = ++paintSeq;
@@ -467,11 +469,18 @@
 
         if (!instant) showText && showText();
       }
-      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), baked ? null : crop, instant, doText);
-      doText();   /* 标题立刻换，不等图片加载 */
+      /* 切换时先显示加载占位（底色 + 三点），标题保持不动，
+         等图片真的显示出来再一起换 —— 标题与当前这张永远一致 */
+      if(!instant) frame.classList.add('is-loading');
+      var loadGuard = setTimeout(doText, 4000);   /* 太慢也别让标题永远卡住；占位继续显示到图真的来 */
+      function done(){
+        clearTimeout(loadGuard);
+        frame.classList.remove('is-loading');
+        doText();
+      }
+      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), baked ? null : crop, instant, done);
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
-      decorateImages(frame);   /* 图没到之前显示底色 + 三个点 */
       renderDots();
     }
     function go(n, instant) { idx = (n + list.length) % list.length; paint(instant); }
