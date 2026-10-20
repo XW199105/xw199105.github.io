@@ -307,8 +307,8 @@
         "视觉插画",
         "随笔练习"
       ],
-      "tagline": "",
-      "summary": "",
+      "tagline": "“别过来！我们走！”",
+      "summary": "“别过来！我们走！”",
       "cover": "cover.jpg",
       "image": "01.jpg",
       "carousel": "carousel.jpg",
@@ -325,8 +325,8 @@
       "tags": [
         "视觉插画"
       ],
-      "tagline": "",
-      "summary": "",
+      "tagline": "“风来了，它把我眼睛吹跑了，我还能看见你吗？”",
+      "summary": "“风来了，它把我眼睛吹跑了，我还能看见你吗？”",
       "cover": "cover.jpg",
       "image": "01.jpg",
       "carousel": null,
@@ -343,14 +343,14 @@
       "tags": [
         "视觉插画"
       ],
-      "tagline": "哈哈哈哈",
-      "summary": "哈哈哈哈",
+      "tagline": "“我看见你脑子里有一条龙”",
+      "summary": "“我看见你脑子里有一条龙”",
       "cover": "cover.jpg",
       "image": "01.jpg",
-      "carousel": null,
-      "carouselM": null,
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2020-02-nz/meta.json",
-      "featured": false,
+      "featured": true,
       "links": null,
       "link": null
     },
@@ -361,8 +361,8 @@
       "tags": [
         "视觉插画"
       ],
-      "tagline": "",
-      "summary": "",
+      "tagline": "梦里出现的巨大黑影久久不散",
+      "summary": "梦里出现的巨大黑影久久不散",
       "cover": "cover.jpg",
       "image": "01.jpg",
       "carousel": "carousel.jpg",

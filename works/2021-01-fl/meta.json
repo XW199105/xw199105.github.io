@@ -5,8 +5,8 @@
   "tags": [
     "视觉插画"
   ],
-  "tagline": "",
-  "description": "",
+  "tagline": "“风来了，它把我眼睛吹跑了，我还能看见你吗？”",
+  "description": "如果我有一双会飞的眼睛，也行脖子就不会那么痛了吧。\n",
   "gallery": [
     "01.jpg"
   ],
@@ -16,8 +16,8 @@
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.72,
-    "panU": 0.04,
-    "panV": -0.0578
+    "x": 0.1111,
+    "y": -0.1606
   },
   "carouselCrop": null,
   "carouselCropM": null,
