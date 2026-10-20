@@ -379,7 +379,7 @@
         cur = 1 - cur;
         if (typeof onShown === 'function') onShown();   // 图片已经换上了，再叫标题出场
       }
-      next.onerror = function () { next.onerror = null; next.src = url('assets/placeholder.svg') };
+      next.onerror = function () { next.onerror = null; };   /* 失败就保持占位，占位就是它的替身 */
       next.onload = swap;
       next.src = src;
       if (next.complete && next.naturalWidth) swap();
@@ -453,35 +453,53 @@
     function carouselFile(w) {
       return mobileMQ.matches ? (w.carouselM || w.carousel) : (w.carousel || w.carouselM);
     }
+    /* 这一页用哪张图（文件名 + 取景参数） */
+    function heroOf(w) {
+      var baked = carouselFile(w), crop = cropFor(w);
+      var name = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
+      return { src: mediaUrl('works', w.id, name) || url('assets/placeholder.svg'), crop: baked ? null : crop };
+    }
+    /* 图片缓存状态：'ok' 已可立即显示 / 'err' 失败 / undefined 还没试过 */
+    var preloadState = {};
+    function prefetchAt(i) {
+      var w = list[(i + list.length) % list.length];
+      if (!w) return;
+      var it = heroOf(w);
+      if (!it.src || preloadState[it.src]) return;
+      preloadState[it.src] = 'pending';
+      var im = new Image();
+      im.onload = function () { preloadState[it.src] = 'ok'; };
+      im.onerror = function () { preloadState[it.src] = 'err'; };
+      im.src = it.src;
+    }
+
+    /* 切页：标题立刻换（属于这一页），图有就用、没有就用占位替身，绝不阻塞交互 */
     function paint(instant) {
       var w = list[idx];
-      var crop = cropFor(w);
-      var baked = carouselFile(w);
-      var heroImg = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
-      /* 先把旧标题淡出，等新图真的显示出来再换字（保证标题与图片一致） */
-      var showText = setText(w, instant);
-      var textDone = false;
+      var it = heroOf(w);
       var myPaint2 = ++paintSeq;
-      function doText() {
-        if (myPaint2 !== paintSeq) return;
-        if (textDone) return;
-        textDone = true;
 
-        if (!instant) showText && showText();
-      }
-      /* 切换时先显示加载占位（底色 + 三点），标题保持不动，
-         等图片真的显示出来再一起换 —— 标题与当前这张永远一致 */
-      if(!instant) frame.classList.add('is-loading');
-      var loadGuard = setTimeout(doText, 4000);   /* 太慢也别让标题永远卡住；占位继续显示到图真的来 */
-      function done(){
-        clearTimeout(loadGuard);
-        frame.classList.remove('is-loading');
-        doText();
-      }
-      showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), baked ? null : crop, instant, done);
+      /* ① 标题先落地：这一页已经是「第 N 件」了 */
+      var showText = setText(w, instant);
+      if (!instant && showText) showText();
+
+      /* ② 图在缓存里就直上；不在就先铺占位（旧图留在底层被盖住，不会闪白） */
+      var ready = preloadState[it.src] === 'ok';
+      if (instant || ready) frame.classList.remove('is-loading');
+      else frame.classList.add('is-loading');
+
+      showImage(it.src, it.crop, instant || ready, function () {
+        if (myPaint2 !== paintSeq) return;
+        frame.classList.remove('is-loading');   /* 图到了，占位替身下岗 */
+      });
+
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
       renderDots();
+
+      /* ③ 顺手预取后面两张，下次切页基本能直接命中 */
+      prefetchAt(idx + 1);
+      prefetchAt(idx + 2);
     }
     function go(n, instant) { idx = (n + list.length) % list.length; paint(instant); }
 
@@ -580,7 +598,7 @@
         if (!w.tagline) w.tagline = m.tagline || '';
         if (!w.description) w.description = m.description || '';
       }).catch(function () {});
-    })).then(function () { paint(); schedule(); });
+    })).then(function () { paint(); prefetchAt(1); prefetchAt(2); schedule(); });
   }
 
   /* ---------------- 作品列表 ---------------- */
