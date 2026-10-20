@@ -746,7 +746,7 @@
     var shots = (w.gallery || []).filter(Boolean);
     if (!shots.length && w.cover) shots = [w.cover];
     var prev = works[i - 1], next = works[i + 1];
-    document.title = w.title + ' — VVXIE STUDIO';
+    document.title = w.title + ' — VVXIE ART';
 
     var tl = (w.tagline || '').trim();
     var desc = (w.description || '').trim();
@@ -953,7 +953,7 @@
       if (i < 0) i = 0;
       var n = notes[i];
       var base = 'notes/' + n.id + '/';
-      document.title = n.title + ' — VVXIE STUDIO';
+      document.title = n.title + ' — VVXIE ART';
 
       var metaP = n.meta ? loadJSON(n.meta).catch(function(){ return {}; }) : Promise.resolve({});
       var mdP = n.content ? loadText(n.content).catch(function(){ return n.body || ''; }) : Promise.resolve(n.body || '');
@@ -1133,7 +1133,7 @@
             title = probe.textContent.trim() || title;
           }
         }
-        document.title = title + ' — VVXIE STUDIO';
+        document.title = title + ' — VVXIE ART';
         $('#note-body').innerHTML =
           '<div class="detail-top">' +
             '<a class="back-link" href="notes.html">← 返回笔记</a>' +
@@ -1162,7 +1162,7 @@
 
   function initAbout() {
     loadJSON('data/about.json').then(function (a) {
-      document.title = (a.aboutHeading || '关于我') + ' — VVXIE STUDIO';
+      document.title = (a.aboutHeading || '关于我') + ' — VVXIE ART';
       var rows = [];
       (a.links || []).forEach(function (l) {
         if (!l) return;
@@ -1350,7 +1350,7 @@
     if (!introShouldPlay()) return;
     try { sessionStorage.setItem(INTRO_KEY, '1') } catch (e) {}
 
-    var words = ['V', 'V', 'X', 'I', 'E'];
+    var words = ['V', 'V', 'X', 'I', 'E', '.', 'C', 'N'];   /* 进场 LOGO：VVXIE.CN */
     var box = document.createElement('div');
     box.className = 'intro-screen';
     box.id = 'intro';
@@ -1359,14 +1359,14 @@
     box.innerHTML = '<div class="intro-frame">' +
       '<i class="intro-rule"></i>' +
       '<div class="intro-mark">' +
-        words.map(function (ch) { return '<span>' + ch + '</span>' }).join('') +
+        words.map(function (ch) { return '<span' + (ch === '.' ? ' class="intro-dot"' : '') + '>' + ch + '</span>' }).join('') +
       '</div>' +
       '<i class="intro-rule"></i>' +
       '</div>';
     document.body.appendChild(box);
 
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var hold = reduced ? 500 : 2450;
+    var hold = reduced ? 500 : 2600;   /* 兜底：万一没收到 animationend 也不会一直挂着 */
     var gone = false;
     // instant=true：点击/按键盘时立刻撤掉，不走淡出；自动结束才淡出
     function finish(instant) {
@@ -1395,6 +1395,22 @@
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') skip(e);
     });
     var autoTimer = setTimeout(function () { finish(false) }, hold);
+    /* 按最后一个字的动画时长精确算淡出时刻：延迟 + 时长 + 120ms 缓一拍 */
+    if (!reduced) {
+      var spans = box.querySelectorAll('.intro-mark span');
+      var lastLetter = spans[spans.length - 1];
+      if (lastLetter) {
+        var cs = window.getComputedStyle(lastLetter);
+        var total = (parseFloat(cs.animationDelay) || 0) + (parseFloat(cs.animationDuration) || 0);
+        if (total > 0) {
+          clearTimeout(autoTimer);
+          autoTimer = setTimeout(function () { finish(false) }, Math.round(total * 1000) + 120);
+        }
+        lastLetter.addEventListener('animationend', function () {
+          setTimeout(function () { finish(false) }, 120);
+        }, { once: true });
+      }
+    }
   }
 
   function initNav() {    var page = document.body.dataset.page || '';

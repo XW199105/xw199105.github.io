@@ -30,7 +30,7 @@ img{max-width:100%}
 
 /* ---------- header ---------- */
 .topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:relative;z-index:5;background:var(--bg)}
-.wordmark{font-family:var(--logo);font-size:26px;letter-spacing:.12em;font-weight:400;text-transform:uppercase}
+.wordmark{font-family:var(--logo);font-size:26px;letter-spacing:.12em;font-weight:400;text-transform:uppercase;white-space:nowrap}
 .nav{display:flex;gap:27px;align-items:center}
 .nav a,.nav button{border:0;background:none;padding:8px 0;color:#555;font-size:15px;font-weight:400;letter-spacing:.03em}
 .nav a:hover,.nav a.active{color:#3f3f3f}
@@ -40,14 +40,17 @@ img{max-width:100%}
   .topbar{height:auto;min-height:60px;display:flex;align-items:center;justify-content:space-between;
     padding:14px 0;gap:14px}
   .topbar-inner{display:flex;align-items:center}
+  .wordmark{font-size:18px;letter-spacing:.06em}
   /* 菜单始终显示，不做二级菜单 */
-  .nav{display:flex;flex-wrap:nowrap;gap:11px;margin:0}
-  .nav a,.nav button{font-size:15px;padding:6px 0;white-space:nowrap}
+  .nav{display:flex;flex-wrap:nowrap;gap:9px;margin:0}
+  .nav a,.nav button{font-size:13.5px;padding:6px 0;white-space:nowrap}
 }
 
 /* 超小屏：顶栏放不下五个菜单时，让菜单折到第二行 */
 @media(max-width:369px){
   .topbar{flex-wrap:wrap;gap:6px;padding:10px 0}
+  .wordmark{font-size:16px}
+  .nav a,.nav button{font-size:12.5px}
   .nav{width:100%;justify-content:space-between;gap:0}
 }
 
@@ -360,7 +363,7 @@ img{max-width:100%}
 .intro-screen.intro-out{opacity:0;visibility:hidden;pointer-events:none}
 /* 上下两条线包住 LOGO：线宽 = LOGO 实际宽度，和字贴得比较近 */
 .intro-frame{display:flex;flex-direction:column;align-items:stretch;width:max-content;gap:11px;position:relative}
-.intro-mark{position:relative;display:flex;align-items:center;justify-content:center;gap:.04em;font-family:var(--logo);font-size:clamp(34px,7vw,66px);font-weight:400;letter-spacing:.16em;margin-right:-.16em;overflow:hidden;
+.intro-mark{position:relative;display:flex;align-items:center;justify-content:center;gap:.04em;font-family:var(--logo);font-size:calc(clamp(34px,7vw,66px) * .85);font-weight:400;letter-spacing:.16em;margin-right:-.16em;overflow:hidden;
   /* 上下留出跳动空间：内边距撑大裁剪框，负外边距抵消，视觉位置不变 */
   --jump:clamp(16px,3vw,26px);padding-block:var(--jump);margin-block:calc(var(--jump) * -1);
   /* Lot 字体上伸部比下伸部长，行盒里的字看起来偏下；按字身大小补偿回来，让上下留白相等 */
@@ -373,7 +376,11 @@ img{max-width:100%}
 .intro-mark span:nth-child(3){--r:-3deg;--d:.34s}
 .intro-mark span:nth-child(4){--r:5deg;--d:.46s}
 .intro-mark span:nth-child(5){--r:-4deg;--d:.58s}
-/* 一道很淡的高光从字母上扫过 */
+.intro-mark span:nth-child(6){--r:2deg;--d:.66s}   /* . */
+.intro-mark span:nth-child(7){--r:-3deg;--d:.74s}   /* C */
+.intro-mark span:nth-child(8){--r:3deg;--d:.82s}    /* N */
+/* 域名点：小一号，压在基线上 */
+.intro-mark span.intro-dot{align-self:center;position:relative;top:.62em;font-size:.42em;line-height:1;padding:0;letter-spacing:0;margin:0 .01em 0 -.06em}
 .intro-mark::after{content:'';position:absolute;inset:-20% -30%;pointer-events:none;opacity:0;
   background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.12) 44%,rgba(255,255,255,.58) 50%,rgba(255,255,255,.12) 56%,transparent 62%);
   transform:translateX(-130%);
