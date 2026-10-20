@@ -32,7 +32,7 @@ img{max-width:100%}
 .topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:relative;z-index:5;background:var(--bg)}
 .wordmark{font-family:var(--logo);font-size:26px;letter-spacing:.12em;font-weight:400;text-transform:uppercase}
 .nav{display:flex;gap:27px;align-items:center}
-.nav a,.nav button{border:0;background:none;padding:8px 0;color:#555;font-size:15px;font-weight:600;letter-spacing:.03em}
+.nav a,.nav button{border:0;background:none;padding:8px 0;color:#555;font-size:15px;font-weight:400;letter-spacing:.03em}
 .nav a:hover,.nav a.active{color:#3f3f3f}
 .nav a.active{border-bottom:2px solid #3f3f3f}
 .mobile-menu{display:none;border:1px solid var(--line);background:var(--bg);padding:7px 11px;font-size:11px;letter-spacing:.08em}
@@ -42,8 +42,15 @@ img{max-width:100%}
   .topbar-inner{display:flex;align-items:center}
   /* 菜单始终显示，不做二级菜单 */
   .nav{display:flex;flex-wrap:nowrap;gap:11px;margin:0}
-  .nav a,.nav button{font-size:13px;padding:6px 0;white-space:nowrap}
+  .nav a,.nav button{font-size:15px;padding:6px 0;white-space:nowrap}
 }
+
+/* 超小屏：顶栏放不下五个菜单时，让菜单折到第二行 */
+@media(max-width:369px){
+  .topbar{flex-wrap:wrap;gap:6px;padding:10px 0}
+  .nav{width:100%;justify-content:space-between;gap:0}
+}
+
 
 /* ---------- page shell ---------- */
 .page{padding-bottom:20px}
@@ -167,13 +174,13 @@ img{max-width:100%}
 }
 @media(max-width:640px){
   .note-grid{gap:10px}
-  .note-card{position:relative;display:block;min-height:168px;padding:0;border:0;
+  .note-card{position:relative;display:block;min-height:112px;padding:0;border:0;
     background:var(--soft);overflow:hidden;border-radius:3px}
   .note-card .note-cover{position:absolute;inset:0;width:100%;height:100%;flex:none;
-    aspect-ratio:auto;object-fit:cover;z-index:0;border-radius:0}
-  .note-card::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.70);z-index:1}
+    aspect-ratio:auto;object-fit:cover;object-position:center top;z-index:0;border-radius:0}
+  .note-card::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.6);z-index:1}
   .note-card .note-text{position:relative;z-index:2;display:flex;flex-direction:column;
-    justify-content:center;min-height:168px;padding:22px 20px}
+    justify-content:center;min-height:112px;padding:22px 20px}
   .note-card h2{font-size:15px;margin:6px 0 0;line-height:1.42;letter-spacing:.01em}
   .note-card p{display:none}
   .note-card .note-date{font-size:10.5px;color:#4f5755;letter-spacing:.04em}
@@ -549,9 +556,9 @@ body[data-page="home"] .footer{margin-top:20px}
 
 /* 手机笔记列表：标题字号真的压下来（基础 .note-card h2 是 27px，写在后面会盖掉断点里的值） */
 @media(max-width:640px){
-  .note-card h2{font-size:19px;line-height:1.4;margin:5px 0 0;letter-spacing:.01em}
+  .note-card h2{font-size:18px;line-height:1.4;margin:5px 0 0;letter-spacing:.01em}
   .note-card .note-date{font-size:10px}
-  .note-card .note-text{padding:18px 16px;min-height:150px}
+  .note-card .note-text{padding:14px 16px;min-height:100px}
 }
 
 /* 笔记正文里的视频嵌入：16:9 容器，iframe 铺满 */
