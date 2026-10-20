@@ -10,16 +10,28 @@
   "gallery": [
     "01.jpg"
   ],
-  "featured": false,
+  "featured": true,
+  "links": null,
+  "link": null,
   "coverCrop": {
     "src": "01.jpg",
-    "zoom": 1.8,
-    "panU": 0.0333,
-    "panV": -0.1778
+    "zoom": 2.05,
+    "x": -0.0804,
+    "y": 0.254
   },
-  "carouselCrop": null,
-  "carouselCropM": null,
-  "carousel": null,
-  "carouselM": null,
-  "updated": "2026-10-19"
+  "carouselCrop": {
+    "src": "01.jpg",
+    "zoom": 1.125,
+    "x": -0.6044,
+    "y": 0.3426
+  },
+  "carouselCropM": {
+    "src": "01.jpg",
+    "zoom": 1,
+    "x": -0.1133,
+    "y": 1
+  },
+  "carousel": "carousel.jpg",
+  "carouselM": "carousel-m.jpg",
+  "updated": "2026-10-20"
 }

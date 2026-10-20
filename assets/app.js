@@ -162,10 +162,18 @@
   /* ---------------- 公共片段 ---------------- */
   /* cover / gallery 在 JSON 里只存文件名（如 cover.png），这里拼上所属目录。
      兼容老数据里的 data:/http: 绝对地址。 */
+  /* 资源目录：data/*.json 的 base 字段（工具里可改），缺省回退 works/、notes/ */
+  var MEDIA_BASE = { works: "works", notes: "notes" };
+  function setMediaBase(kind, data) {
+    if (data && typeof data.base === "string" && data.base) {
+      MEDIA_BASE[kind] = data.base.replace(/^\/+|\/+$/g, "");
+    }
+  }
   function mediaUrl(kind, id, name) {
-    if (!name) return '';
+    if (!name) return "";
     if (/^(data:|https?:)/i.test(name)) return name;
-    return url((kind === 'notes' ? 'notes/' : 'works/') + id + '/' + name);
+    var b = MEDIA_BASE[kind] || (kind === "notes" ? "notes" : "works");
+    return url(b + "/" + id + "/" + name);
   }
 
   /* 老数据用的是 panU/panV（以视口宽度为单位），这里按图片尺寸换算成新的 x/y */
@@ -234,7 +242,7 @@
   /* ---------------- 首页：精选轮播 + 最近内容 ---------------- */
   function initHome() {
     Promise.all([loadJSON('data/works.json'), loadJSON('data/notes.json')])
-      .then(function (res) {
+    .then(function (res) { setMediaBase('works', res[0]); setMediaBase('notes', res[1]);
         buildCarousel(res[0].works || []);
       })
       .catch(function (e) { fail('#feature', e); });
@@ -512,7 +520,7 @@
     // 轮播要用「取景参数 / 详情图第一张 / 一句话简介」，这些都可能在 meta.json 里。
     // 精选件数通常很少，统一先读一遍再首次渲染，避免先闪一下再换。
     Promise.all(list.map(function (w) {
-      return loadJSON(w.meta || ('works/' + w.id + '/meta.json')).then(function (m) {
+      return loadJSON(w.meta || ((MEDIA_BASE.works||'works') + '/' + w.id + '/meta.json')).then(function (m) {
         if (Array.isArray(m.gallery)) w.gallery = m.gallery;
         if (m.carouselCrop) w.carouselCrop = m.carouselCrop;
         if (m.carouselCropM) w.carouselCropM = m.carouselCropM;
@@ -624,7 +632,7 @@
 
   /* ---------------- 作品列表 ---------------- */
   function initWorks() {
-    loadJSON('data/works.json').then(function (data) {
+  loadJSON('data/works.json').then(function (data) { setMediaBase('works', data);
       var works = data.works || [];
       if (!works.length) { fail('#works-grid', new Error('empty')); return; }
       buildFilterPanel($('#filters'), $('#works-grid'), $('#works-empty'), works, {
@@ -638,7 +646,7 @@
   /* ---------------- 作品详情 ---------------- */
   function initWork() {
     var id = param('id');
-    loadJSON('data/works.json').then(function (data) {
+  loadJSON('data/works.json').then(function (data) { setMediaBase('works', data);
       // 与列表保持同一顺序：按日期新的在前，上一件/下一件才符合直觉
       var works = (data.works || []).slice().sort(byDateDesc);
       if (!works.length) { fail('#work-body', new Error('empty')); return; }
@@ -646,12 +654,14 @@
       if (i < 0) i = 0;
       var w = works[i];
 
-      loadJSON(w.meta || ('works/' + w.id + '/meta.json')).then(function (meta) {
+      loadJSON(w.meta || ((MEDIA_BASE.works||'works') + '/' + w.id + '/meta.json')).then(function (meta) {
         w.tagline = meta.tagline || w.tagline || '';
         if (Array.isArray(meta.tags) && meta.tags.length) w.tags = meta.tags;
         else if (meta.category && !tagsOf(w).length) w.tags = [meta.category];
         if (!dateOf(w) && meta.date) w.date = meta.date;
         w.description = meta.description || '';
+          if (Array.isArray(meta.links) && meta.links.length) w.links = meta.links.filter(function (l) { return l && (l.href || l.text); });
+          else if (meta.link && (meta.link.href || '').trim()) w.links = [meta.link];
         w.gallery = meta.gallery || w.gallery || [];
         w.updated = meta.updated || '';
         paint(works, i, w);
@@ -660,7 +670,7 @@
   }
 
   function paint(works, i, w) {
-    var base = 'works/' + w.id + '/';
+    var base = (MEDIA_BASE.works || 'works') + '/' + w.id + '/';
     // 详情页只显示「细节图」，封面仅用于列表/轮播；没有任何细节图时退回封面，避免空白
     var shots = (w.gallery || []).filter(Boolean);
     if (!shots.length && w.cover) shots = [w.cover];
@@ -685,6 +695,12 @@
             '</button>';
           }).join('') +
         '</div>' +
+          (function () {
+            var lk = (Array.isArray(w.links) && w.links.length) ? w.links : (w.link ? [w.link] : []);
+            return lk.filter(function (l) { return l && (l.href || '').trim(); }).map(function (l) {
+              return '<a class="detail-link only-narrow" href="' + esc(l.href) + '" target="_blank" rel="noopener">' + esc(l.text || l.href) + '</a>';
+            }).join('');
+          })() +
         '<aside class="detail-info">' +
           '<h1>' + esc(w.title) + '</h1>' +
           tlHtml +
@@ -694,6 +710,12 @@
               '<span class="info-tags">' + (tags.length ? tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') : '—') + '</span>' +
               '<span class="info-year">' + esc(yearOf(w) || '—') + '</span>' +
             '</div>' +
+          (function () {
+            var lk = (Array.isArray(w.links) && w.links.length) ? w.links : (w.link ? [w.link] : []);
+            return lk.filter(function (l) { return l && (l.href || '').trim(); }).map(function (l) {
+              return '<a class="detail-link only-wide" href="' + esc(l.href) + '" target="_blank" rel="noopener">' + esc(l.text || l.href) + '</a>';
+            }).join('');
+          })() +
           '<div class="detail-pager">' +
             (prev ? '<a href="work.html?id=' + encodeURIComponent(prev.id) + '" title="' + esc(prev.title) + '">← 上一件</a>' : '<button disabled>← 上一件</button>') +
             (next ? '<a href="work.html?id=' + encodeURIComponent(next.id) + '" title="' + esc(next.title) + '">下一件 →</a>' : '<button disabled>下一件 →</button>') +
@@ -719,7 +741,7 @@
       '</div></a>';
   }
   function initNotes() {
-    loadJSON('data/notes.json').then(function (data) {
+  loadJSON('data/notes.json').then(function (data) { setMediaBase('notes', data);
       var notes = data.notes || [];
       var grid = $('#notes-grid');
       if (!notes.length) { grid.innerHTML = '<div class="empty">还没有发布的笔记。</div>'; return; }
@@ -852,7 +874,7 @@
 
   function initNote() {
     var id = param('id');
-    loadJSON('data/notes.json').then(function (data) {
+  loadJSON('data/notes.json').then(function (data) { setMediaBase('notes', data);
       var notes = data.notes || [];
       if (!notes.length) { fail('#note-body', new Error('empty')); return; }
       var i = notes.map(function (n) { return n.id; }).indexOf(id);

@@ -256,6 +256,18 @@ img{max-width:100%}
 .detail-info h1{font:300 clamp(30px,4vw,48px)/1.08 var(--heiti-light);margin:9px 0 18px}
 .detail-info .tagline{color:#555;font-size:13px;line-height:1.8;margin:0 0 22px;max-width:34em}
 .detail-info .desc{white-space:pre-wrap;color:#777;font-size:12px;line-height:1.9;margin:0 0 25px}
+/* 作品信息栏底部的链接按钮：宽度跟随信息框，10px 小标题字，无动效 */
+.detail-link{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;
+  margin-top:8px;padding:9px 12px;border:1px solid var(--line);border-radius:2px;
+  font-size:10px;line-height:1.6;letter-spacing:.06em;color:#555;text-decoration:none;
+  background:rgba(255,255,255,.35);text-align:center;word-break:break-all}
+.detail-link:hover{color:#3f3f3f;border-color:#9aa5a3;background:rgba(255,255,255,.6)}
+.detail-link:first-of-type{margin-top:0}
+.detail-link.only-narrow{display:none}
+@media(max-width:640px){
+  .detail-link.only-wide{display:none}
+  .detail-link.only-narrow{display:flex;margin:12px 0 0}
+}
 .info-row{border-top:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;gap:15px;font-size:11px}
 .info-row span:first-child{color:#888}
 .detail-pager{display:flex;justify-content:space-between;margin-top:0;border-top:1px solid var(--line);padding-top:18px;font-size:11px}

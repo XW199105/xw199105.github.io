@@ -1,10 +1,10 @@
 {
-  "updated": "2026-10-19",
+  "updated": "2026-10-20",
+  "base": "works",
   "tags": [
     "视觉插画",
     "随笔练习",
     "实物雕塑",
-    "过程分享",
     "同人练习"
   ],
   "works": [
@@ -22,7 +22,17 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2024-02-long/meta.json",
-      "featured": true
+      "featured": true,
+      "links": [
+        {
+          "text": "作品相关笔记",
+          "href": "http://vvxie.cn/note.html?id=2026-10-long"
+        }
+      ],
+      "link": {
+        "text": "作品相关笔记",
+        "href": "http://vvxie.cn/note.html?id=2026-10-long"
+      }
     },
     {
       "id": "2026-06-hb",
@@ -38,7 +48,9 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2026-06-hb/meta.json",
-      "featured": true
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2026-08-bgy",
@@ -54,7 +66,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2026-08-bgy/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2026-02-xi",
@@ -70,7 +84,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2026-02-xi/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-12-hlmf",
@@ -87,7 +103,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2025-12-hlmf/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-11-mf",
@@ -103,7 +121,9 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2025-11-mf/meta.json",
-      "featured": true
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-11-fll",
@@ -119,7 +139,9 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2025-11-fll/meta.json",
-      "featured": true
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-11-bj",
@@ -136,7 +158,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2025-11-bj/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-04-mydm2",
@@ -152,7 +176,9 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2025-04-mydm2/meta.json",
-      "featured": true
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2025-04-mydm1",
@@ -168,7 +194,9 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2025-04-mydm1/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2024-03-zz",
@@ -184,7 +212,17 @@
       "carousel": "carousel.jpg",
       "carouselM": "carousel-m.jpg",
       "meta": "works/2024-03-zz/meta.json",
-      "featured": true
+      "featured": true,
+      "links": [
+        {
+          "text": "作品相关笔记",
+          "href": "http://vvxie.cn/note.html?id=2026-10-zz"
+        }
+      ],
+      "link": {
+        "text": "作品相关笔记",
+        "href": "http://vvxie.cn/note.html?id=2026-10-zz"
+      }
     },
     {
       "id": "2023-11-fxm",
@@ -200,7 +238,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2023-11-fxm/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2022-09-sen",
@@ -217,7 +257,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2022-09-sen/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2022-05-mdzw",
@@ -234,7 +276,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2022-05-mdzw/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2021-08-em",
@@ -251,7 +295,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2021-08-em/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2021-03-ys",
@@ -265,10 +311,12 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
-      "carousel": null,
-      "carouselM": null,
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2021-03-ys/meta.json",
-      "featured": false
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2021-01-fl",
@@ -284,7 +332,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2021-01-fl/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2020-02-nz",
@@ -300,7 +350,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2020-02-nz/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2019-10-ls",
@@ -313,10 +365,12 @@
       "summary": "",
       "cover": "cover.jpg",
       "image": "01.jpg",
-      "carousel": null,
-      "carouselM": null,
+      "carousel": "carousel.jpg",
+      "carouselM": "carousel-m.jpg",
       "meta": "works/2019-10-ls/meta.json",
-      "featured": false
+      "featured": true,
+      "links": null,
+      "link": null
     },
     {
       "id": "2019-09-yh",
@@ -333,7 +387,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2019-09-yh/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2019-09-bw",
@@ -349,7 +405,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2019-09-bw/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2019-08-qg",
@@ -366,7 +424,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2019-08-qg/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2017-10-jx",
@@ -383,7 +443,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2017-10-jx/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2017-10-ji",
@@ -400,7 +462,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2017-10-ji/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     },
     {
       "id": "2012-05-j",
@@ -416,7 +480,9 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2012-05-j/meta.json",
-      "featured": false
+      "featured": false,
+      "links": null,
+      "link": null
     }
   ]
 }

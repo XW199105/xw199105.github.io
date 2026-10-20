@@ -21,6 +21,8 @@
     "11.jpg"
   ],
   "featured": true,
+  "links": null,
+  "link": null,
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.89,
@@ -41,5 +43,5 @@
   },
   "carousel": "carousel.jpg",
   "carouselM": "carousel-m.jpg",
-  "updated": "2026-10-19"
+  "updated": "2026-10-20"
 }

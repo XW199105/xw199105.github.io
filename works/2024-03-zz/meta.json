@@ -21,6 +21,16 @@
     "11.jpg"
   ],
   "featured": true,
+  "links": [
+    {
+      "text": "作品相关笔记",
+      "href": "http://vvxie.cn/note.html?id=2026-10-zz"
+    }
+  ],
+  "link": {
+    "text": "作品相关笔记",
+    "href": "http://vvxie.cn/note.html?id=2026-10-zz"
+  },
   "coverCrop": {
     "src": "01.jpg",
     "zoom": 1.19,
@@ -41,5 +51,5 @@
   },
   "carousel": "carousel.jpg",
   "carouselM": "carousel-m.jpg",
-  "updated": "2026-10-19"
+  "updated": "2026-10-20"
 }
