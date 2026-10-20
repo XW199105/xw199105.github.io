@@ -359,31 +359,7 @@
 
     // 两张图叠在一起做交叉淡入：新图淡入的同时旧图淡出，不会闪白也不会跳
     // instant=true（手动滑动翻页）时不淡入，直接切换
-    // onShown：新图真正显示到画框之后回调（标题等它）
-    function showImage(src, crop, instant, onShown) {
-      var next = layers[1 - cur];
-      var my = ++token;
-      function swap() {
-        if (my !== token) return;
-        applyFrameCrop(next, crop);
-        // 关键：清掉回调，否则「缓存命中时同步 swap + 之后的 onload」会执行两次，
-        // 把刚点亮的那层又熄灭，出现空白
-        next.onload = null;
-        next.onerror = null;
-        if (instant) {
-          frame.classList.add('no-fade');
-          setTimeout(function () { frame.classList.remove('no-fade'); }, 80);
-        }
-        next.classList.add('on');
-        layers[cur].classList.remove('on');
-        cur = 1 - cur;
-        if (typeof onShown === 'function') onShown();   // 图片已经换上了，再叫标题出场
-      }
-      next.onerror = function () { next.onerror = null; };   /* 失败就保持占位，占位就是它的替身 */
-      next.onload = swap;
-      next.src = src;
-      if (next.complete && next.naturalWidth) swap();
-    }
+    // 页面 = 一个开关：见 runPage（标题/底板/图文时序都在那里）
 
     // 标题逐字拆成 span，每个字错开出现（重新赋值 innerHTML 会自动重播动画）
     function splitChars(s) {
@@ -391,58 +367,7 @@
         return '<span class="ch" style="--i:' + i + '">' + (ch === ' ' ? '&nbsp;' : esc(ch)) + '</span>';
       }).join('');
     }
-    var textGuard = null, textSwapTimer = null, paintSeq = 0;
-    /* 标题不再用固定延时，而是等「图片真的显示出来」再换：
-       ① 换图一开始，旧标题先淡出
-       ② 图片加载完成、真正铺到画框上以后，再换文案并播入场动画
-       ③ 万一图片加载失败或太慢，3.5s 后标题照常出现，不会一直空着 */
-    function setText(w, instant, delay) {
-      var line = w.tagline || w.summary || firstSentence(w.description) || '';
-      var nChars = Array.from(String(w.title || '')).length;
-      clearTimeout(textSwapTimer);
-
-      function applyText() {
-        title.setAttribute('aria-label', w.title);      // 读屏仍然读整句
-        title.innerHTML = splitChars(w.title);           // 新元素 → 动画自动从头播
-        desc.textContent = line;
-        desc.style.display = line ? '' : 'none';
-        var panel = text.parentNode;
-        if (panel && panel.classList && panel.classList.contains('feature-copy')) {
-          panel.classList.remove('cap-play');
-          void panel.offsetHeight;                       // 强制重排，让动画从头开始
-          if (!instant) panel.classList.add('cap-play'); // 滑动瞬时切换就不播
-        }
-        // 简介是同一个 <p>，不重建的话动画只播一次；这里手动重启
-        desc.style.animation = 'none';
-        void desc.offsetHeight;                          // 强制重排，让 none 生效
-        desc.style.animation = '';
-        // 安全网：最长一段动画是「逐字错开 + 0.9s 时长」，超时就强制显示
-        text.classList.remove('chars-done');
-        clearTimeout(textGuard);
-        if (instant) {
-          // 手动滑动翻页：不播逐字动画，直接显示
-          text.classList.add('chars-done');
-          return;
-        }
-        textGuard = setTimeout(function () { text.classList.add('chars-done') },
-          Math.max(1800, nChars * 60 + 900 + 400));
-      }
-
-      function run() {
-        text.classList.remove('is-out');
-        applyText();
-      }
-
-      if (instant) { run(); return run }
-
-      // 先把旧标题淡掉，等图片显示出来再换字（delay 由图片 onShown 触发）
-      text.classList.add('is-out');
-      if (typeof delay === 'number') {
-        textSwapTimer = setTimeout(run, Math.max(0, delay));
-      }
-      // 不传 delay 时由调用方（图片 onShown）调用返回的函数
-      return run;
-    }
+    var textGuard = null;
     // 手机宽度用竖版取景（9:16），桌面用横版
     var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
     function cropFor(w) {
@@ -453,13 +378,23 @@
     function carouselFile(w) {
       return mobileMQ.matches ? (w.carouselM || w.carousel) : (w.carousel || w.carouselM);
     }
-    /* 这一页用哪张图（文件名 + 取景参数） */
+    /* ================= 一页 = 一个开关 =================
+       instant 仅用于首屏和取景重算，忽略所有延时：
+         t=0     旧标题瞬间隐藏；新视觉层淡入（0.9s，真图或占位）
+         t=700   底板从左展开（0.5s，收尾变慢）
+         t=1140  文字逐字浮起（错开 42ms，单字 0.72s）≈ 底板走完 88%
+       图迟到就只在层内做「占位→图」替换，标题节奏完全不动。 */
+    var TIMING = { title: 900, text: 1000 };
+
+    function applyFrameCropOnce(im, crop) { applyFrameCrop(im, crop); }
+
     function heroOf(w) {
       var baked = carouselFile(w), crop = cropFor(w);
       var name = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
       return { src: mediaUrl('works', w.id, name) || url('assets/placeholder.svg'), crop: baked ? null : crop };
     }
-    /* 图片缓存状态：'ok' 已可立即显示 / 'err' 失败 / undefined 还没试过 */
+
+    /* 预取：只记状态，不参与动画 */
     var preloadState = {};
     function prefetchAt(i) {
       var w = list[(i + list.length) % list.length];
@@ -473,44 +408,108 @@
       im.src = it.src;
     }
 
-    /* 切页：标题立刻换（属于这一页），图有就用、没有就用占位替身，绝不阻塞交互 */
-    function paint(instant) {
-      var w = list[idx];
+    var pageSeq = 0, pageTimers = [];
+    function clearPageTimers() { pageTimers.forEach(clearTimeout); pageTimers = []; }
+    function later(fn, ms) { var t = setTimeout(fn, ms); pageTimers.push(t); return t; }
+
+    function runPage(n, instant) {
+      var w = list[n];
+      if (!w) return;
+      var my = ++pageSeq;
+      clearPageTimers();
+      clearTimeout(textGuard);
+
       var it = heroOf(w);
-      var myPaint2 = ++paintSeq;
-
-      /* ① 标题先落地：这一页已经是「第 N 件」了 */
-      var showText = setText(w, instant);
-      if (!instant && showText) showText();
-
-      /* ② 图在缓存里就直上；不在就先铺占位（旧图留在底层被盖住，不会闪白） */
       var ready = preloadState[it.src] === 'ok';
-      if (instant || ready) frame.classList.remove('is-loading');
-      else frame.classList.add('is-loading');
-
-      showImage(it.src, it.crop, instant || ready, function () {
-        if (myPaint2 !== paintSeq) return;
-        frame.classList.remove('is-loading');   /* 图到了，占位替身下岗 */
-      });
-
-      layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
+      layers.forEach(function (im) { im.alt = w.title });
       renderDots();
 
-      /* ③ 顺手预取后面两张，下次切页基本能直接命中 */
+      /* ---------- 画面：新层淡入；没就绪就先叠占位（占位就是这一页的图） ---------- */
+      var next = layers[1 - cur], old = layers[cur];
+      var skel = frame.querySelector('.skel');
+
+      next.onload = next.onerror = null;
+      next.classList.remove('on', 'quick');
+      if (it.crop) applyFrameCropOnce(next, it.crop); else next.style.cssText = '';
+      next.src = it.src;
+
+      function revealImage(quick) {
+        if (my !== pageSeq) return;
+        next.onload = next.onerror = null;
+        if (quick) next.classList.add('quick');
+        next.classList.add('on');
+        if (skel) skel.classList.add('quick');
+        frame.classList.remove('is-placeholder');
+        old.classList.remove('on');
+        cur = 1 - cur;
+      }
+
+      if (instant) {
+        next.classList.add('on');
+        frame.classList.remove('is-placeholder');
+        old.classList.remove('on');
+        cur = 1 - cur;
+      } else if (ready) {
+        frame.classList.remove('is-placeholder');
+        revealImage(false);
+      } else {
+        frame.classList.add('is-placeholder');
+        next.onload = function () { revealImage(true) };
+        next.onerror = function () { };
+        if (next.complete && next.naturalWidth) revealImage(true);
+      }
+
+      /* ---------- 标题：先底板，后文字 ---------- */
+      var line = w.tagline || w.summary || firstSentence(w.description) || '';
+      var panel = text.parentNode;
+      if (panel && panel.classList) { panel.classList.remove('cap-play'); panel.classList.add('cap-hide'); }   /* 收起旧底板 */
+      /* 先把新内容以纯文本放进去（隐藏），底板宽度立刻就是最终宽度，
+         这样展开过程中不会因为文字插入而「顿一下」 */
+      title.setAttribute('aria-label', w.title);
+      title.textContent = w.title;
+      desc.textContent = line;
+      desc.style.display = line ? '' : 'none';
+      text.classList.remove('chars-done');   /* 关键：上一页的兜底类会让新文字顶不住，先摘掉 */
+      text.classList.add('is-out');
+
+      function panelOn() {
+        if (my !== pageSeq) return;
+        if (panel && panel.classList) {
+          panel.classList.remove('cap-hide');
+          panel.classList.remove('cap-play');
+          void panel.offsetHeight;
+          panel.classList.add('cap-play');           /* 底板从左展开，收尾变慢 */
+        }
+      }
+      function textOn() {
+        if (my !== pageSeq) return;
+        title.innerHTML = splitChars(w.title);       /* 换成逐字 span → 逐字浮起 */
+        desc.style.animation = 'none';
+        void desc.offsetHeight;
+        desc.style.animation = '';
+        text.classList.remove('is-out');             /* 文字浮现 */
+        text.classList.remove('chars-done');
+        textGuard = setTimeout(function () { text.classList.add('chars-done') },
+          Math.max(1800, Array.from(String(w.title || '')).length * 60 + 1300));
+      }
+
+      if (instant) { panelOn(); textOn(); return; }
+
+      later(panelOn, TIMING.title);
+      later(textOn, TIMING.text);
       prefetchAt(idx + 1);
       prefetchAt(idx + 2);
     }
-    function go(n, instant) { idx = (n + list.length) % list.length; paint(instant); }
-
+    function go(n, instant) { idx = (n + list.length) % list.length; runPage(idx, instant); }
     // 屏幕宽度跨过断点（横竖屏切换）时，重新套用当前这张的取景
 
     function reapplyCrop() {
       var w = list[idx]; if (!w) return;
       var on = layers[1 - cur];
-      if (carouselFile(w)) { paint(true); return; }   // 有烘焙好的轮播图 → 直接换文件
+      if (carouselFile(w)) { runPage(idx, true); return; }   // 有烘焙好的轮播图 → 直接换文件
       if (on && on.naturalWidth) applyFrameCrop(on, cropFor(w));
-      else paint();
+      else runPage(idx);
     }
     if (mobileMQ.addEventListener) mobileMQ.addEventListener('change', reapplyCrop);
     else if (mobileMQ.addListener) mobileMQ.addListener(reapplyCrop);
@@ -598,7 +597,7 @@
         if (!w.tagline) w.tagline = m.tagline || '';
         if (!w.description) w.description = m.description || '';
       }).catch(function () {});
-    })).then(function () { paint(); prefetchAt(1); prefetchAt(2); schedule(); });
+    })).then(function () { runPage(0); prefetchAt(1); prefetchAt(2); schedule(); });
   }
 
   /* ---------------- 作品列表 ---------------- */

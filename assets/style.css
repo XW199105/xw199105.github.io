@@ -458,13 +458,14 @@ img{max-width:100%}
 .feature-copy::before{
   content:'';position:absolute;inset:0;z-index:-1;
   background:rgba(255,255,255,.62);
-  -webkit-backdrop-filter:blur(12px) saturate(1.15);
-  backdrop-filter:blur(12px) saturate(1.15);
+  -webkit-backdrop-filter:blur(10px) saturate(1.12);
+  backdrop-filter:blur(10px) saturate(1.12);
   border-top-right-radius:2px;
-  transform:scaleX(1);transform-origin:left center;
+  clip-path:inset(0 0 0 0);
 }
+.feature-copy.cap-hide::before{clip-path:inset(0 100% 0 0)}   /* 切页瞬间先收起，等 TIMING.title 再展开 */
 .feature-copy.cap-play::before{
-  animation:capPanel .78s cubic-bezier(.16,1,.3,1);        /* 先快后慢，缓出 */
+  animation:capPanel .5s cubic-bezier(.12,.86,.22,1) both;   /* 起手快，收尾慢 */
 }
 .feature-copy h1{
   font:300 clamp(17px,2vw,28px)/1.25 var(--heiti-light);
@@ -476,19 +477,19 @@ img{max-width:100%}
 }
 .feature-text{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:18px;
   transition:opacity .24s ease,transform .24s ease}
-.feature-text.is-out{opacity:0;transform:translateY(-5px)}
+.feature-text.is-out{opacity:0!important;transform:translateY(-5px);transition:none}   /* 隐藏必须压过 chars-done 的 !important */
 .feature-text.is-out .ch,.feature-text.is-out p{animation:none!important}
 
 /* --- 新动效：白底从左侧展开 → 标题逐字浮起（无旋转） → 副标题跟上 --- */
 @keyframes capPanel{
   /* 从左往右拉长，先快后慢（缓出） */
-  0%{transform:scaleX(0)}
-  100%{transform:scaleX(1)}
+  0%{clip-path:inset(0 100% 0 0)}
+  100%{clip-path:inset(0 0 0 0)}
 }
 .feature-copy h1 .ch{
   display:inline-block;opacity:0;transform:translateY(12px);filter:blur(6px);
   animation:capChar .72s cubic-bezier(.2,.75,.25,1) both;
-  animation-delay:calc(var(--i,0) * 42ms + 520ms);
+  animation-delay:calc(var(--i,0) * 42ms);
 }
 @keyframes capChar{
   0%{opacity:0;transform:translateY(12px);filter:blur(6px)}
@@ -497,7 +498,7 @@ img{max-width:100%}
 }
 .feature-copy p{
   opacity:0;
-  animation:capLine .6s cubic-bezier(.2,.75,.25,1) 720ms both;
+  animation:capLine .6s cubic-bezier(.2,.75,.25,1) 120ms both;
 }
 @keyframes capLine{
   0%{opacity:0;transform:translateX(-8px)}
@@ -536,7 +537,6 @@ img{max-width:100%}
 .feature-frame:active{cursor:grabbing}
 
 /* 手动滑动翻页：不做淡入，直接换图 */
-.feature-frame.no-fade .feat-img{transition:none!important}
 
 /* 减弱动效：轮播标题不做入场动画（放最后，覆盖前面的 animation 声明） */
 @media(prefers-reduced-motion:reduce){
@@ -583,7 +583,6 @@ body[data-page="home"] .footer{margin-top:20px}
 }
 .note-rich figure:has(.video-embed){max-width:min(100%,880px)}
 
-
 /* 笔记详情：所有块间距统一 5px；要留白就自己隔一行（空段落会照常占一行） */
 .note-rich figure{margin:5px 0}
 /* 真正空的段落不占位（编辑器自动补的占位符，存的时候会被去掉） */
@@ -623,7 +622,12 @@ body[data-page="home"] .footer{margin-top:20px}
 @media(prefers-reduced-motion:reduce){ .skel i{animation:none;opacity:.45} }
 
 /* 轮播：切换时显示加载占位，标题与图片同步切换 */
-.feature-frame > .skel{display:none}
-.feature-frame.is-loading > .skel{display:flex}
+.feature-frame > .skel{display:flex;opacity:0;pointer-events:none;transition:opacity .9s cubic-bezier(.4,0,.2,1)}
+.feature-frame.is-placeholder > .skel{opacity:1}
 .feature-frame > .feature-copy{z-index:4}
 .feature-frame > .skel i{background:#6f7c7a}
+
+/* 页内替换：占位→真图（也是 0.5s 淡入） */
+.feature-frame img.quick{transition-duration:.5s,7.6s}
+.feature-frame > .skel.quick{transition-duration:.35s}
+
