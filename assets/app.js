@@ -892,6 +892,15 @@
             c.remove();
           }
         });
+        /* 标题太长其实是段落（Word 导入常见）→ 转回 <p>，与编辑器一致 */
+        Array.prototype.slice.call(root.querySelectorAll('h2,h3')).forEach(function (h) {
+          if ((h.textContent || '').trim().length <= 40) return;
+          var ph = document.createElement('p');
+          ph.innerHTML = h.innerHTML;
+          if (h.getAttribute('style')) ph.setAttribute('style', h.getAttribute('style'));
+          if (h.getAttribute('class')) ph.setAttribute('class', h.getAttribute('class'));
+          h.parentNode.replaceChild(ph, h);
+        });
         /* 裸文字没有块级祖先，text-align 无处落点 → 包成段落 */
         Array.prototype.slice.call(root.childNodes).forEach(function (n) {
           if (n.nodeType === 3) {
