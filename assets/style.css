@@ -607,3 +607,17 @@ body[data-page="home"] .footer{margin-top:20px}
 .note-rich th,.note-rich td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 .note-rich th{background:rgba(0,0,0,.03);font-weight:400;color:#3f3f3f}
 
+/* ---------- 图片加载占位：底色 + 三个缓慢闪动的点 ---------- */
+.has-skel{position:relative}
+.has-skel>img:not([data-ok]){opacity:0}
+.skel{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;
+  gap:7px;background:var(--soft);pointer-events:none;border-radius:inherit}
+.skel i{width:6px;height:6px;border-radius:50%;background:#b7c1bf;display:block;
+  animation:skelDot 1.5s ease-in-out infinite}
+.skel i:nth-child(2){animation-delay:.2s}
+.skel i:nth-child(3){animation-delay:.4s}
+@keyframes skelDot{
+  0%,100%{opacity:.16;transform:translateY(0)}
+  45%{opacity:.72;transform:translateY(-2px)}
+}
+@media(prefers-reduced-motion:reduce){ .skel i{animation:none;opacity:.45} }

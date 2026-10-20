@@ -43,6 +43,50 @@
     return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
   }
 
+  /* ---------------- 图片加载占位（底色 + 三个闪动的点） ----------------
+     任何 <img> 还没加载好时，在它的容器里盖一层 .skel；加载完自动撤掉。 */
+  function skelFor(im){
+    var box = im.parentElement;
+    if (!box) return null;
+    if (box.querySelector(':scope > .skel')) return null;
+    box.classList.add('has-skel');
+    var d = document.createElement('span');
+    d.className = 'skel';
+    d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<i></i><i></i><i></i>';
+    box.appendChild(d);
+    return d;
+  }
+  function clearSkel(im){
+    im.setAttribute('data-ok', '1');
+    var box = im.parentElement;
+    if (!box) return;
+    var d = box.querySelector(':scope > .skel');
+    if (d) d.remove();
+    /* 容器里所有图片都好了才去掉 has-skel */
+    var left = [].filter.call(box.querySelectorAll('img'), function (x) { return !x.getAttribute('data-ok'); });
+    if (!left.length) box.classList.remove('has-skel');
+  }
+  function decorateImages(root){
+    if (!root) return;
+    var imgs = root.tagName === 'IMG' ? [root] : [].slice.call(root.querySelectorAll('img'));
+    imgs.forEach(function (im) {
+      if (im.getAttribute('data-ok')) return;
+      if (im.complete && im.naturalWidth) { clearSkel(im); return }
+      skelFor(im);
+    });
+  }
+  /* 全局：图片一好就撤占位（capture 才能收到 load 事件） */
+  document.addEventListener('load', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'IMG') clearSkel(t);
+  }, true);
+  document.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'IMG') clearSkel(t);
+  }, true);
+
+  window.__vvxie = { decorateImages: decorateImages, clearSkel: clearSkel, skelFor: skelFor };
   function imgErr(el, fallback) {
     el.addEventListener('error', function () {
       if (el.dataset.fallbackDone) return;
@@ -243,7 +287,7 @@
   function initHome() {
     Promise.all([loadJSON('data/works.json'), loadJSON('data/notes.json')])
     .then(function (res) { setMediaBase('works', res[0]); setMediaBase('notes', res[1]);
-        buildCarousel(res[0].works || []);
+        buildCarousel(res[0].works || []); decorateImages(document);
       })
       .catch(function (e) { fail('#feature', e); });
   }
@@ -412,7 +456,7 @@
       var crop = cropFor(w);
       var baked = carouselFile(w);
       var heroImg = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
-      // 先让旧标题淡出，拿到「图片显示后」要执行的换字函数
+      /* 标题不再等图片：图片在后台加载，标题照常轮播（图加载完自己淡入） */
       var showText = setText(w, instant);
       var textDone = false;
       var myPaint2 = ++paintSeq;
@@ -420,14 +464,14 @@
         if (myPaint2 !== paintSeq) return;
         if (textDone) return;
         textDone = true;
-        clearTimeout(slowGuard);
-        if (!instant) showText && showText();          // 图片已经显示 → 标题接上
+
+        if (!instant) showText && showText();
       }
-      // 图片加载失败 / 太慢时，别让标题一直空着
-      var slowGuard = setTimeout(doText, instant ? 0 : 3500);
       showImage(mediaUrl('works', w.id, heroImg) || url('assets/placeholder.svg'), baked ? null : crop, instant, doText);
+      doText();   /* 标题立刻换，不等图片加载 */
       layers.forEach(function (im) { im.alt = w.title });
       frame.href = 'work.html?id=' + encodeURIComponent(w.id);
+      decorateImages(frame);   /* 图没到之前显示底色 + 三个点 */
       renderDots();
     }
     function go(n, instant) { idx = (n + list.length) % list.length; paint(instant); }
@@ -640,6 +684,7 @@
         yearOf: yearOf,
         render: function (w) { return workCard(w); }
       })();
+      decorateImages(document);
     }).catch(function (e) { fail('#works-grid', e); });
   }
 
@@ -722,7 +767,7 @@
           '</div>' +
         '</aside>' +
       '</div>';
-    $$('img', $('#work-body')).forEach(function (im) { imgErr(im, 'assets/placeholder.svg'); });
+    decorateImages($('#work-body')); $$('img', $('#work-body')).forEach(function (im) { imgErr(im, 'assets/placeholder.svg'); });
     initGalleryZoom($('#work-body'));
   }
 
@@ -762,6 +807,7 @@
             sep: '<div class="note-sep" aria-hidden="true"></div>',
             render: noteCard
         })();
+        decorateImages(document);
       }
     }).catch(function (e) { fail('#notes-grid', e); });
   }
@@ -1074,7 +1120,7 @@
               bodyHtml +
             '</article>' +
           '</div>';
-    $$('img', $('#note-body')).forEach(function (im) { imgErr(im, 'assets/placeholder.svg'); });
+    decorateImages($('#note-body')); $$('img', $('#note-body')).forEach(function (im) { imgErr(im, 'assets/placeholder.svg'); });
       });
     }).catch(function (e) { fail('#note-body', e); });
   }
@@ -1160,6 +1206,7 @@
 
       var av = $('.about-avatar');
       if (av) imgErr(av, 'assets/placeholder.svg');
+    decorateImages(document.getElementById('about') || document);
       initAboutGallery();
     }).catch(function (e) { fail('#about-body', e); });
   }
