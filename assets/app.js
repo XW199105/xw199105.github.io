@@ -1561,15 +1561,22 @@
       mark.appendChild(sh);
     }
 
+    /* 文字版用到的字符表（SVG 版不需要它）。放在这里，降级分支才拿得到。 */
+    var words = ['V', 'V', 'X', 'I', 'E', '.', 'C', 'N'];
+
     /* 统一入口：有 SVG 就上 SVG，失败退回文字版；然后补高光、启动淡出计时。
-       注意动画本身不需要这里触发 —— 元素一进 DOM，CSS 动画就自己跑了。 */
+       注意动画本身不需要这里触发 —— 元素一进 DOM，CSS 动画就自己跑了。
+       这里全程 try 包住：任何一步出错都只是少一点效果，绝不能把用户困在三个点上。 */
     function start(svgText) {
       var ok = false;
       if (svgText) { try { ok = buildSvg(svgText) } catch (e) { ok = false } }
-      if (!ok) buildText();
+      if (!ok) { try { buildText() } catch (e) {} }
       frame.classList.remove('is-loading');   /* 三个点的占位状态可以撤了 */
-      addSheen();
-      tick();
+      try { addSheen() } catch (e) {}
+      try { tick() } catch (e) {}
+
+      /* 最后一道保险：两种画面都没成功 → 不要停在三个点上，直接结束进场 */
+      if (!frame.querySelector('.intro-logo, .intro-mark')) finish(false);
     }
 
     var hold = reduced ? 500 : 2600;
@@ -1621,20 +1628,29 @@
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') skip(e);
     });
 
-    /* 260ms 预算：SVG 是本地小文件，通常几毫秒就到；
-       万一网络/磁盘慢，宁可先上文字版也不要让进场空着等。launch 只生效一次。 */
+    /* 取 LOGO：
+       ① 本次会话里取过就存在 sessionStorage（3.6KB，很小），下次直接同步用，连请求都不用；
+       ② 没缓存才 fetch；260ms 内没回来就先上文字版，绝不让进场空着等；
+       ③ 任何一步失败都退回文字版，而且 start() 里还有「两种都失败就直接结束」的保险。 */
     var launched = false;
     function launch(svgText) {
       if (launched) return;
       launched = true;
       start(svgText);
     }
+    var LOGO_CACHE = 'vvxie_logo_svg';
+    var cachedLogo = '';
+    try { cachedLogo = sessionStorage.getItem(LOGO_CACHE) || '' } catch (e) { cachedLogo = '' }
+    if (cachedLogo) { launch(cachedLogo); return; }
+
     var budget = setTimeout(function () { launch(null) }, 260);
-    /* 用 force-cache：这个文件几乎不变，缓存住最省事。
-       失败（file:// 打开、文件缺失）就走 catch → launch(null) → 文字版。 */
     fetch(url('assets/logo.svg'), { cache: 'force-cache' })
       .then(function (r) { if (!r.ok) throw new Error('http'); return r.text() })
-      .then(function (txt) { clearTimeout(budget); launch(txt) })
+      .then(function (txt) {
+        try { sessionStorage.setItem(LOGO_CACHE, txt) } catch (e) {}   /* 存下来，下次零延迟 */
+        clearTimeout(budget);
+        launch(txt);
+      })
       .catch(function () { clearTimeout(budget); launch(null) });
   }
 
