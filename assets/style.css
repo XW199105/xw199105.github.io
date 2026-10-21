@@ -359,11 +359,11 @@ img{max-width:100%}
 }
 
 /* ---------- 进站 LOGO 动画 ---------- */
-.intro-screen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;transition:opacity .9s cubic-bezier(.7,0,.2,1),visibility .9s}
+.intro-screen{--logo-size:calc(clamp(34px,7vw,66px) * .85);--gap-top:.22em;--gap-bottom:.14em;position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;transition:opacity .9s cubic-bezier(.7,0,.2,1),visibility .9s}
 .intro-screen.intro-out{opacity:0;visibility:hidden;pointer-events:none}
 /* 上下两条线包住 LOGO：线宽 = LOGO 实际宽度，和字贴得比较近 */
-.intro-frame{display:flex;flex-direction:column;align-items:stretch;width:max-content;gap:11px;position:relative}
-.intro-mark{position:relative;display:flex;align-items:center;justify-content:center;gap:.04em;font-family:var(--logo);font-size:calc(clamp(34px,7vw,66px) * .85);font-weight:400;letter-spacing:.16em;margin-right:-.16em;overflow:hidden;
+.intro-frame{display:flex;flex-direction:column;align-items:stretch;width:max-content;gap:0;position:relative;font-size:var(--logo-size,56px)}
+.intro-mark{position:relative;display:block;text-align:center;white-space:nowrap;font-family:var(--logo);font-size:var(--logo-size,56px);font-weight:400;letter-spacing:.16em;margin-right:-.16em;overflow:hidden;
   /* 上下留出跳动空间：内边距撑大裁剪框，负外边距抵消，视觉位置不变 */
   --jump:clamp(16px,3vw,26px);padding-block:var(--jump);margin-block:calc(var(--jump) * -1);
   /* Lot 字体上伸部比下伸部长，行盒里的字看起来偏下；按字身大小补偿回来，让上下留白相等 */
@@ -380,7 +380,7 @@ img{max-width:100%}
 .intro-mark span:nth-child(7){--r:-3deg;--d:.74s}   /* C */
 .intro-mark span:nth-child(8){--r:3deg;--d:.82s}    /* N */
 /* 域名点：小一号，压在基线上 */
-.intro-mark span.intro-dot{align-self:center;position:relative;top:.62em;font-size:.42em;line-height:1;padding:0;letter-spacing:0;margin:0 .01em 0 -.06em}
+.intro-mark span.intro-dot{font-size:.42em;line-height:1;letter-spacing:0;margin:0 .01em 0 -.06em}
 .intro-mark::after{content:'';position:absolute;inset:-20% -30%;pointer-events:none;opacity:0;
   background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.12) 44%,rgba(255,255,255,.58) 50%,rgba(255,255,255,.12) 56%,transparent 62%);
   transform:translateX(-130%);
@@ -389,7 +389,8 @@ img{max-width:100%}
 .intro-rule{display:block;height:1px;background:#4a4a4a;width:100%;transform-origin:center;
   transform:scaleX(0) translateY(var(--from,0px));
   animation:introRule .82s cubic-bezier(.2,.72,.26,1) var(--d,1.02s) forwards}
-.intro-rule:first-child{--from:-10px;--d:1.02s}
+.intro-rule:first-child{--from:-10px;--d:1.02s;margin-bottom:var(--gap-top,.22em)}
+.intro-rule:last-child{margin-top:var(--gap-bottom,.14em)}   /* 下线比上线近一点，视觉更居中 */
 .intro-rule:last-child{--from:10px;--d:1.16s}
 @keyframes introLetter{
   0%{opacity:0;transform:translateY(36px) rotate(var(--r,0deg)) scale(1.1);filter:blur(8px)}
