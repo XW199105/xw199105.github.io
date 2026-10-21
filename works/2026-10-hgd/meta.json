@@ -1,0 +1,33 @@
+{
+  "id": "2026-10-hgd",
+  "title": "花骨朵",
+  "date": "2026-10-09",
+  "tags": [
+    "随笔练习",
+    "同人练习"
+  ],
+  "tagline": "",
+  "description": "最近挺喜欢亚细亚旷世奇才和洛天依的《花骨朵》\n令人动容，于是做了这个练习。",
+  "gallery": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg",
+    "05.jpg",
+    "06.jpg"
+  ],
+  "featured": false,
+  "links": null,
+  "link": null,
+  "coverCrop": {
+    "src": "01.jpg",
+    "zoom": 1.74,
+    "x": 0.5565,
+    "y": 0.2875
+  },
+  "carouselCrop": null,
+  "carouselCropM": null,
+  "carousel": null,
+  "carouselM": null,
+  "updated": "2026-10-21"
+}

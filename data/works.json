@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-20",
+  "updated": "2026-10-21",
   "base": "works",
   "tags": [
-    "视觉插画",
     "随笔练习",
+    "视觉插画",
     "实物雕塑",
     "同人练习"
   ],
@@ -15,8 +15,8 @@
       "tags": [
         "实物雕塑"
       ],
-      "tagline": "",
-      "summary": "",
+      "tagline": "来自春天的龙",
+      "summary": "来自春天的龙",
       "cover": "cover.jpg",
       "image": "01.jpg",
       "carousel": "carousel.jpg",
@@ -480,6 +480,25 @@
       "carousel": null,
       "carouselM": null,
       "meta": "works/2012-05-j/meta.json",
+      "featured": false,
+      "links": null,
+      "link": null
+    },
+    {
+      "id": "2026-10-hgd",
+      "title": "花骨朵",
+      "date": "2026-10-09",
+      "tags": [
+        "随笔练习",
+        "同人练习"
+      ],
+      "tagline": "",
+      "summary": "最近挺喜欢亚细亚旷世奇才和洛天依的《花骨朵》，令人动容，于是做了这个练习",
+      "cover": "cover.jpg",
+      "image": "01.jpg",
+      "carousel": null,
+      "carouselM": null,
+      "meta": "works/2026-10-hgd/meta.json",
       "featured": false,
       "links": null,
       "link": null
