@@ -1410,25 +1410,31 @@
     if (window.console) console.warn('[VVXIE]', msg);
   }
 
-  /* ---------------- 进站 LOGO 动画 ----------------
-     仅在“真正进站”时播放：
-       · 直接打开 / 输入网址 / 从外部链接进入 / 刷新 → 播放
-       · 站内点击链接切换页面（含浏览器前进后退）    → 不播放
-     sessionStorage 作为老浏览器的兜底：同一标签页内只播一次。 */
+  /* ==========================================================================
+     进站 LOGO 动画 —— 要不要播
+     --------------------------------------------------------------------------
+     规则：
+       · 浏览器前进 / 后退              → 不播
+       · 主页（data-page="home"）刷新    → 播（刷新当作重新进站）
+       · 其它页面刷新                    → 不播（避免每刷一次都被拦住）
+       · 本次会话第一次进入（任何页面）  → 播
+       · 站内点击链接切换页面            → 不播
+     判断依据：navigation type + sessionStorage 里的「本次会话已播过」标记。 */
   var INTRO_KEY = 'vvxie_intro_seen';
   function introShouldPlay() {
+    var page = (document.body && document.body.dataset.page) || '';
     var type = '';
     try {
       var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
       type = (nav && nav.type) || (performance.navigation && performance.navigation.type === 1 ? 'reload' : '');
     } catch (e) { type = '' }
-    if (type === 'reload') return true;       // 刷新：播放
-    if (type === 'back_forward') return false; // 前进/后退：跳过
-    if (type === 'navigate') {
-      // 站内链接跳转也会报 navigate，用同一会话标记区分
-      try { return sessionStorage.getItem(INTRO_KEY) !== '1' } catch (e) { return true }
-    }
-    try { return sessionStorage.getItem(INTRO_KEY) !== '1' } catch (e) { return true }
+
+    var seen = false;
+    try { seen = sessionStorage.getItem(INTRO_KEY) === '1' } catch (e) { seen = false }
+
+    if (type === 'back_forward') return false;               // 前进后退：跳过
+    if (page === 'home' && type === 'reload') return true;   // 主页刷新：播
+    return !seen;                                            // 其余：本次会话第一次进入才播
   }
   /* ==========================================================================
      进场画面（LOGO 动画）—— 整体设计
@@ -1441,20 +1447,51 @@
         所以在 Illustrator 里改形状/改 viewBox 都不用回来改数值。
      4) 动画怎么挂：JS 只负责注入 + 给每个字写 --i / --r（出场序号、倾斜角度），
         真正的 keyframes 全在 style.css（introLetterSvg / introRuleSvg / introSheenSvg）。
-     5) 什么时候消失：读最后一个字的 animation-delay + duration，再停 620ms 才淡出。
+     5) 什么时候消失：读最后一个字的 animation-delay + duration，再停 320ms 才淡出。
      ========================================================================== */
+
+  /* 正文闸门（两级）：
+       html.intro-pending  遮罩还没插进 DOM → 正文隐藏 + 禁止滚动（防「先闪一下内容」）
+       html.intro-playing  遮罩已经在播   → 正文照常显示，但仍然禁止滚动
+     放开时机：
+       · 这次不播进场（站内跳转、非主页刷新等）→ 两个都摘掉，直接可浏览
+       · 要播 → 遮罩一插进 DOM 就把 intro-pending 换成 intro-playing；
+                进场结束（播完 / 用户点掉）再摘 intro-playing。
+     再留 4s + pageshow 兜底，防止任何异常把正文一直藏着。 */
+  function releaseContent() {
+    var el = document.documentElement;
+    if (!el || !el.classList) return;
+    el.classList.remove('intro-pending');
+    el.classList.add('intro-playing');
+  }
+  function unlockPage() {
+    var el = document.documentElement;
+    if (!el || !el.classList) return;
+    el.classList.remove('intro-pending');
+    el.classList.remove('intro-playing');
+  }
+  setTimeout(unlockPage, 4000);
+  /* 只有从 bfcache 恢复（浏览器后退）时才需要解锁；正常加载别碰，否则会把播放中的滚动锁一并解掉 */
+  window.addEventListener('pageshow', function (e) { if (e && e.persisted) unlockPage(); });
+
   function initIntro() {
     if (document.getElementById('intro')) return;
-    if (!introShouldPlay()) return;
+
+    /* 这次不播：直接放开，正常浏览 */
+    if (!introShouldPlay()) { unlockPage(); return; }
     try { sessionStorage.setItem(INTRO_KEY, '1') } catch (e) {}
 
-    /* ---------- 画面：优先用 SVG 版（不受字体度量影响） ---------- */
+    /* 画面骨架：先摆三个跳动的点当「正在准备」的占位。
+       LOGO（SVG 或文字版）一到位就把这里整个换掉，所以永远不会出现「空屏」。 */
     var box = document.createElement('div');
     box.className = 'intro-screen';
     box.id = 'intro';
     box.setAttribute('aria-hidden', 'true');
-    box.innerHTML = '<div class="intro-frame"></div>';
+    box.innerHTML = '<div class="intro-frame is-loading">' +
+      '<span class="intro-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
+      '</div>';
     document.body.appendChild(box);
+    releaseContent();          /* 遮罩已盖住正文，可以把内容放出来了 */
 
     var frame = box.querySelector('.intro-frame');
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1530,6 +1567,7 @@
       var ok = false;
       if (svgText) { try { ok = buildSvg(svgText) } catch (e) { ok = false } }
       if (!ok) buildText();
+      frame.classList.remove('is-loading');   /* 三个点的占位状态可以撤了 */
       addSheen();
       tick();
     }
@@ -1537,7 +1575,7 @@
     var hold = reduced ? 500 : 2600;
     var gone = false, autoTimer = null;
     /* 淡出计时。「最后一个字」的动画结束时刻 = animation-delay + animation-duration，
-       再加 620ms（字落位后多停半秒），到点开始淡出。
+       再加 320ms（字落位后再停一下），到点开始淡出。
        同时挂一个 animationend 监听作为更精确的触发（两个谁先到用谁，finish 有幂等保护）。
        万一读不到时长（老浏览器、动画被禁用），外层还有 hold 兜底。 */
     function tick() {
@@ -1558,6 +1596,7 @@
     function finish(instant) {
       if (gone) return;
       gone = true;
+      unlockPage();     /* 解除滚动锁 */
       clearTimeout(autoTimer);
       if (instant) {
         if (box.parentNode) box.parentNode.removeChild(box);

@@ -380,6 +380,20 @@ img{max-width:100%}
    .intro-mark       文字版降级用的一行字；点靠基线对齐（inline-block 天然共享基线）。
    ========================================================================== */
 /* ---------- 进站 LOGO 动画 ---------- */
+
+/* 进场闸门：遮罩还没插进 DOM 之前，正文先藏着，避免手机上先闪一下内容。
+   这个类由每个页面 head 里的内联脚本立刻加上，app.js 的 releaseContent() 负责摘掉。 */
+html.intro-pending{overflow:hidden}
+html.intro-pending body{visibility:hidden}
+html.intro-playing{overflow:hidden}   /* 进场播放期间也不让背景滚动 */
+
+/* 进场「正在准备」状态：三个点，和图片占位用的是同一套闪动动画 */
+.intro-frame.is-loading{min-width:200px;min-height:72px;display:flex;align-items:center;justify-content:center}
+.intro-dots{display:flex;align-items:center;gap:8px}
+.intro-dots i{width:7px;height:7px;border-radius:50%;background:#7c8886;display:block;
+  animation:skelDot 1.5s ease-in-out infinite}
+.intro-dots i:nth-child(2){animation-delay:.2s}
+.intro-dots i:nth-child(3){animation-delay:.4s}
 .intro-screen{--logo-size:calc(clamp(34px,7vw,66px) * .85);--gap-top:.22em;--gap-bottom:.14em;position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;transition:opacity .9s cubic-bezier(.7,0,.2,1),visibility .9s}
 .intro-screen.intro-out{opacity:0;visibility:hidden;pointer-events:none}
 /* 上下两条线包住 LOGO：线宽 = LOGO 实际宽度，和字贴得比较近 */

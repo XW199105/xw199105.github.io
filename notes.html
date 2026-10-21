@@ -6,6 +6,22 @@
 <title>笔记 — VVXIE ART</title>
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<!-- 进场遮罩就绪前先把正文藏起来，避免手机上先闪一下内容；
+     由 app.js 的 releaseContent() 在遮罩出现后立刻放开。
+     noscript / app.js 没跑起来时，下面的兜底样式保证内容仍然可见。 -->
+<script>
+(function(){
+  document.documentElement.className += ' intro-pending';
+
+  /* app.js 若没接管（没加载/报错），1.2 秒后自动放开，绝不白屏；
+     已经接管的话（遮罩在播）保留滚动锁，由它自己结束时解除 */
+  setTimeout(function(){
+    var el = document.documentElement;
+    if (el.classList.contains('intro-pending')) el.classList.remove('intro-pending');
+  }, 1200);
+})();
+</script>
+<noscript><style>html.intro-pending{overflow:auto}html.intro-pending body{visibility:visible!important}</style></noscript>
 
 </head>
 <body data-page="notes">
