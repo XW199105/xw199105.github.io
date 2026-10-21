@@ -293,6 +293,29 @@
       .catch(function (e) { fail('#feature', e); });
   }
 
+  /* ==========================================================================
+     首页轮播 —— 整体设计
+     --------------------------------------------------------------------------
+     DOM 结构（下面一次性生成）：
+       .feature-frame            画框（<a>，点进去是作品详情）
+         img.feat-img ×2         两个图层，交叉淡入用（同一时刻只有一张带 .on）
+         span.skel               占位图层：底色 + 三个点，图片没到就顶替它
+         .feature-copy           标题底板（::before 就是那层半透明白底）
+           .feature-text         标题 + 简介，带 .is-out 时整体隐藏
+       .feature-controls         左右箭头 + 圆点
+
+     一句话模型：一页 = 一个开关（runPage）。切到第 n 页时：
+       t=0     旧标题瞬间隐藏；新的一层淡入（真图 或 占位）
+       t=900   底板从左往右展开（0.5s，起手快、收尾慢）
+       t=1000  标题逐字浮起，正好贴在底板快展开完时
+       图迟到 → 只在同一层里「占位 → 真图」替换，标题节奏完全不动
+
+     为什么是「两层 + 占位」：
+       · 两层：新图淡入时旧图还在下面，中间不会闪白；
+       · 占位：图没下载完时它就是这张图的替身，交互（标题、切页）不被网络拖住。
+
+     关键约定：动画节拍只由「切页」驱动，绝不跟随图片加载事件。
+     ========================================================================== */
   function buildCarousel(works) {
     var host = $('#feature');
     if (!host) return;
@@ -304,6 +327,8 @@
       return;
     }
 
+    /* 画框里一次把三种图层都放好：两个 <img> 是双缓冲，<span class="skel"> 是占位替身。
+       顺序很重要：.skel 排在图片之后、标题之前 —— 它要盖住旧图，但压在标题下面。 */
     host.innerHTML =
       '<div class="feature-visual" id="feature-visual">' +
         '<a class="feature-frame" id="feature-frame" href="#">' +
@@ -321,15 +346,21 @@
         '</div>' +
       '</div>';
 
+    /* -------------------------------------------------------------- 状态
+       idx      当前第几张（list 下标）
+       timer    自动轮播定时器（每次跳转都重排，避免和手动操作打架）
+       cur      当前可见的是 0 号还是 1 号图层（layers[cur] 就是「旧图」）
+       INTERVAL 自动轮播间隔
+       reduced  系统开了「减少动态效果」时走无动画分支 */
     var INTERVAL = 6000;                       // 每张停留时间（放慢）
-    var idx = 0, timer = null, token = 0, cur = 0;
+    var idx = 0, timer = null, cur = 0;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var title = $('#feature-title'), desc = $('#feature-desc'), text = $('#feature-text'),
         frame = $('#feature-frame'), layers = $$('.feat-img', frame),
           dots = $('#feature-dots');
 
-    // 圆点：数量多的时候只显示当前附近的一段（窗口），避免挤掉左右箭头
-    // 精选作品不限数量，全都会参与轮播
+    /* 圆点数量超过 DOT_MAX 时只显示「当前附近的一小段」窗口，否则会把左右箭头挤掉。
+       list 本身不裁剪：精选有多少件，就都参与轮播。 */
     var DOT_MAX = 9;
     function dotWindow(n, cur, max) {
       if (n <= max) return { s: 0, e: n };
@@ -338,6 +369,8 @@
       return { s: s, e: s + max };
     }
     var dotKey = '';
+    /* 画圆点：只有「窗口范围变化」时才重建 DOM（dotKey 做脏检查），
+       但 active 状态每次都刷新 —— 同一窗口内切换不必重建。 */
     function renderDots() {
       var win = dotWindow(list.length, idx, DOT_MAX);
       var key = win.s + ':' + win.e;
@@ -357,37 +390,51 @@
       });
     }
 
-    // 两张图叠在一起做交叉淡入：新图淡入的同时旧图淡出，不会闪白也不会跳
-    // instant=true（手动滑动翻页）时不淡入，直接切换
-    // 页面 = 一个开关：见 runPage（标题/底板/图文时序都在那里）
+    /* 两张 <img> 叠在一起就是「双缓冲」：切页时把新图写进非当前那一层，
+       等它就绪再交换 .on，旧的留在下面淡出 —— 画框里任何时刻都有内容。
+       具体时序和占位替换都在 runPage()，这里只放公共小工具。 */
 
     // 标题逐字拆成 span，每个字错开出现（重新赋值 innerHTML 会自动重播动画）
+    /* 标题逐字拆 span：每个字带 --i，CSS 用 animation-delay:calc(var(--i) * 42ms)
+       做「逐字浮起」。重新赋值 innerHTML 会让新元素自动从头播动画。 */
     function splitChars(s) {
       return Array.from(String(s == null ? '' : s)).map(function (ch, i) {
         return '<span class="ch" style="--i:' + i + '">' + (ch === ' ' ? '&nbsp;' : esc(ch)) + '</span>';
       }).join('');
     }
+    /* textGuard：「逐字动画万一没跑起来」的兜底计时。到点给 .feature-text 加
+       .chars-done，CSS 里那条 !important 规则会把标题强制显示出来，绝不留白。 */
     var textGuard = null;
     // 手机宽度用竖版取景（9:16），桌面用横版
     var mobileMQ = window.matchMedia('(max-width:640px)');  // 与 CSS 的画框断点一致
+    /* 取景参数：meta.json 里存的是「原图上的裁切矩形」。
+       手机（<=640px，和 CSS 断点一致）优先用竖版 carouselCropM，桌面用横版 carouselCrop。 */
     function cropFor(w) {
       var m = w.carouselCropM, d = w.carouselCrop;
       return (mobileMQ.matches && m) ? m : d;
     }
     /* 首页用工具烘焙好的轮播图（carousel.jpg / carousel-m.jpg），没有再退回 CSS 取景 */
+    /* 工具里烘焙好的成品图（carousel.jpg / carousel-m.jpg）：
+       有就直接用整张文件，没有才退回 CSS 取景（applyFrameCrop）。 */
     function carouselFile(w) {
       return mobileMQ.matches ? (w.carouselM || w.carousel) : (w.carousel || w.carouselM);
     }
-    /* ================= 一页 = 一个开关 =================
-       instant 仅用于首屏和取景重算，忽略所有延时：
-         t=0     旧标题瞬间隐藏；新视觉层淡入（0.9s，真图或占位）
-         t=700   底板从左展开（0.5s，收尾变慢）
-         t=1140  文字逐字浮起（错开 42ms，单字 0.72s）≈ 底板走完 88%
-       图迟到就只在层内做「占位→图」替换，标题节奏完全不动。 */
+    /* ========== 一页的入场时间轴（ms，从「切页那一刻」开始算）==========
+         t=0     旧标题瞬间隐藏（.is-out）+ 新的一层淡入 0.9s（真图或占位）
+         t=900   底板从左往右展开（style.css 里 capPanel，0.5s，收尾变慢）
+         t=1000  标题逐字浮起（capChar，每字错开 42ms），贴着底板收尾
+       这里只决定「何时开始」，动画本身的时长/缓动全在 style.css。
+       instant=true（首屏首帧、横竖屏重算取景）时全部走同步分支，不加延时。 */
     var TIMING = { title: 900, text: 1000 };
 
+    /* 只是给 applyFrameCrop 起个更好读的小名：在 runPage 里一眼能看出
+       「这一步是在把取景参数套到图层上」。 */
     function applyFrameCropOnce(im, crop) { applyFrameCrop(im, crop); }
 
+    /* 这一页用哪张图 —— 按优先级依次回退：
+         烘焙好的轮播图 → CSS 取景的原图 → 竖版裁切图 → 横版裁切图
+         → 详情图第一张 → 单图 → 封面
+       返回 { src, crop }；crop 只有「不是烘焙图」时才需要（要给图层套裁切）。 */
     function heroOf(w) {
       var baked = carouselFile(w), crop = cropFor(w);
       var name = baked || (crop && crop.src) || (w.carouselCropM && w.carouselCropM.src) || (w.carouselCrop && w.carouselCrop.src) || (w.gallery && w.gallery[0]) || w.image || w.cover;
@@ -395,7 +442,11 @@
     }
 
     /* 预取：只记状态，不参与动画 */
+    /* 预取状态表：url → 'pending' | 'ok' | 'err'。
+       只用来判断「切过去时图是否已经在缓存里」，不参与任何动画。 */
     var preloadState = {};
+    /* 预取第 i 张（列表循环）。用了 new Image() 提前下载，切页时大概率已就绪，
+       于是直接淡入、占位一闪而过；网慢时占位就顶住，不会阻塞交互。 */
     function prefetchAt(i) {
       var w = list[(i + list.length) % list.length];
       if (!w) return;
@@ -408,10 +459,18 @@
       im.src = it.src;
     }
 
+    /* 切页序号 + 本页的定时器集合。
+       pageSeq：每次切页自增，回调里比对它就知道「这一页是不是已经被切走了」，
+                晚到的定时器一律作废，快速连点也不会串页。
+       later()：把 setTimeout 登记进来，切页时统一 clear。 */
     var pageSeq = 0, pageTimers = [];
     function clearPageTimers() { pageTimers.forEach(clearTimeout); pageTimers = []; }
     function later(fn, ms) { var t = setTimeout(fn, ms); pageTimers.push(t); return t; }
 
+    /* ==================== 切到第 n 页 ====================
+       instant=true 只用在两处：首屏第一帧、横竖屏切换后重算取景。
+       它会跳过所有延时（标题、底板立刻到位），因为那不是「用户切页」。
+       其余情况按 TIMING 的时间轴依次播放，详见下面四段。 */
     function runPage(n, instant) {
       var w = list[n];
       if (!w) return;
@@ -426,6 +485,8 @@
       renderDots();
 
       /* ---------- 画面：新层淡入；没就绪就先叠占位（占位就是这一页的图） ---------- */
+      /* next = 要显示的新图层；old = 还留在下面的旧图层。
+         先把 next 复位（去掉 on / quick）并写入新 src，此时它还完全透明。 */
       var next = layers[1 - cur], old = layers[cur];
       var skel = frame.querySelector('.skel');
 
@@ -434,6 +495,9 @@
       if (it.crop) applyFrameCropOnce(next, it.crop); else next.style.cssText = '';
       next.src = it.src;
 
+      /* 让新图层亮起来：给它加 .on（CSS 里 0.9s 淡入），旧图层去掉 .on 悄悄退场，
+         同时撤掉占位。quick=true 表示「页内替换」（占位→真图），用 0.5s 的快版。
+         因为可能在图片 onload 里被异步调用，先比对 pageSeq 防止过期回调生效。 */
       function revealImage(quick) {
         if (my !== pageSeq) return;
         next.onload = next.onerror = null;
@@ -473,6 +537,9 @@
       text.classList.remove('chars-done');   /* 关键：上一页的兜底类会让新文字顶不住，先摘掉 */
       text.classList.add('is-out');
 
+      /* 标题第一拍：底板从左展开。
+         先摘 cap-hide（切页瞬间收起的状态），再重新加 cap-play 触发动画；
+         中间的 void offsetHeight 是强制重排，让同名动画能重新播一遍。 */
       function panelOn() {
         if (my !== pageSeq) return;
         if (panel && panel.classList) {
@@ -482,6 +549,9 @@
           panel.classList.add('cap-play');           /* 底板从左展开，收尾变慢 */
         }
       }
+      /* 标题第二拍：文字落位。
+         把纯文本换成逐字 span（触发逐字浮起）；desc 用「先 none 再空」重启行动画；
+         最后摘掉 is-out 让文字显现，并挂上 chars-done 的兜底计时。 */
       function textOn() {
         if (my !== pageSeq) return;
         title.innerHTML = splitChars(w.title);       /* 换成逐字 span → 逐字浮起 */
@@ -494,6 +564,8 @@
           Math.max(1800, Array.from(String(w.title || '')).length * 60 + 1300));
       }
 
+      /* instant 分支：不加延时，底板和文字立刻到位（首屏 / 重算取景用）。
+         注意这里 return 得早，避免下面再排一遍定时器。 */
       if (instant) { panelOn(); textOn(); return; }
 
       later(panelOn, TIMING.title);
@@ -501,9 +573,12 @@
       prefetchAt(idx + 1);
       prefetchAt(idx + 2);
     }
+    /* 跳页：取模保证首尾循环；真正的绘制都交给 runPage。 */
     function go(n, instant) { idx = (n + list.length) % list.length; runPage(idx, instant); }
     // 屏幕宽度跨过断点（横竖屏切换）时，重新套用当前这张的取景
 
+    /* 屏幕宽度跨过 640px 断点（手机横竖屏切换、拖窗口）时重算取景：
+         有烘焙图 → 直接换文件；没有 → 给当前图层套新的裁切矩形，套不上就整页重画。 */
     function reapplyCrop() {
       var w = list[idx]; if (!w) return;
       var on = layers[1 - cur];
@@ -519,12 +594,16 @@
     });
 
     // 始终循环：不因悬停、也不因标签页前后台切换而停（后台由浏览器自己降频）
+    /* 自动轮播循环。刻意不在悬停、也不在标签页切后台时暂停：
+       后台由浏览器自己降频，前台永远保持固定节奏。 */
     function schedule() {
       if (timer) { clearTimeout(timer); timer = null; }
       if (list.length < 2) return;
       timer = setTimeout(function () { timer = null; go(idx + 1); schedule(); }, INTERVAL);
     }
 
+    /* 手动操作后都要调一次 schedule()：把「下一次自动切」的计时重新排，
+       否则刚点完就可能马上又被自动切走。 */
     $('#feature-prev').addEventListener('click', function () { go(idx - 1); schedule(); });
     $('#feature-next').addEventListener('click', function () { go(idx + 1); schedule(); });
     dots.addEventListener('click', function (e) {
@@ -535,10 +614,13 @@
 
     /* ---------------- 滑动翻页（手机滑、桌面按住拖） ---------------- */
     // 手感：不跟手、不播动画，横向划过一小段就立刻换图（像相册翻页）
+    /* 拖动状态：dragX/Y 起点，dragT 起始时间（用来算速度），
+       isDrag 是否已判定为横向拖动，suppressClick 用来吞掉「划完顺手点开链接」的那一下。 */
     var dragX = 0, dragY = 0, dragT = 0, dragging = false, isDrag = false, suppressClick = false;
     var THRESH = 18;          // 横向拖过这么多像素就翻页（越小越灵敏）
     var THRESH_VEL = 0.35;    // 或者快速划动（px/ms）也算
 
+    /* 手指按下：鼠标只认左键；只有一件作品时不启用拖动。 */
     frame.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (list.length < 2) return;
@@ -589,6 +671,9 @@
 
     // 轮播要用「取景参数 / 详情图第一张 / 一句话简介」，这些都可能在 meta.json 里。
     // 精选件数通常很少，统一先读一遍再首次渲染，避免先闪一下再换。
+    /* 首帧之前先把精选作品的 meta.json 都读一遍（取景参数、详情图、一句话简介都在里面）。
+       精选通常只有几件，并行读很快；读完再画第一帧，避免「先闪一下再换」。
+       任何一件读失败都不影响整体（catch 掉），退化成没有裁切参数。 */
     Promise.all(list.map(function (w) {
       return loadJSON(w.meta || ((MEDIA_BASE.works||'works') + '/' + w.id + '/meta.json')).then(function (m) {
         if (Array.isArray(m.gallery)) w.gallery = m.gallery;
@@ -1345,30 +1430,131 @@
     }
     try { return sessionStorage.getItem(INTRO_KEY) !== '1' } catch (e) { return true }
   }
+  /* ==========================================================================
+     进场画面（LOGO 动画）—— 整体设计
+     --------------------------------------------------------------------------
+     1) 要不要播：只有「首次打开 / 刷新」才播，站内跳转和前进后退都跳过
+        （判断依据是 performance.navigation.type + sessionStorage，见 introShouldPlay）。
+     2) 画面从哪来：优先 fetch assets/logo.svg 内联进来（纯路径几何，
+        不受字体、设备、排版引擎影响）；260ms 内没拿到就退回文字版，绝不让进场卡住。
+     3) 尺寸怎么定：读 SVG 里字母的真实包围盒，反推出「让字高 = 0.768em」需要的 SVG 高度，
+        所以在 Illustrator 里改形状/改 viewBox 都不用回来改数值。
+     4) 动画怎么挂：JS 只负责注入 + 给每个字写 --i / --r（出场序号、倾斜角度），
+        真正的 keyframes 全在 style.css（introLetterSvg / introRuleSvg / introSheenSvg）。
+     5) 什么时候消失：读最后一个字的 animation-delay + duration，再停 620ms 才淡出。
+     ========================================================================== */
   function initIntro() {
     if (document.getElementById('intro')) return;
     if (!introShouldPlay()) return;
     try { sessionStorage.setItem(INTRO_KEY, '1') } catch (e) {}
 
-    var words = ['V', 'V', 'X', 'I', 'E', '.', 'C', 'N'];   /* 进场 LOGO：VVXIE.CN */
+    /* ---------- 画面：优先用 SVG 版（不受字体度量影响） ---------- */
     var box = document.createElement('div');
     box.className = 'intro-screen';
     box.id = 'intro';
     box.setAttribute('aria-hidden', 'true');
-    // 上下各一条线，包住 LOGO；线宽跟随 LOGO 的实际宽度
-    box.innerHTML = '<div class="intro-frame">' +
-      '<i class="intro-rule"></i>' +
-      '<div class="intro-mark">' +
-        words.map(function (ch) { return '<span' + (ch === '.' ? ' class="intro-dot"' : '') + '>' + ch + '</span>' }).join('') +
-      '</div>' +
-      '<i class="intro-rule"></i>' +
-      '</div>';
+    box.innerHTML = '<div class="intro-frame"></div>';
     document.body.appendChild(box);
 
+    var frame = box.querySelector('.intro-frame');
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var hold = reduced ? 500 : 2600;   /* 兜底：万一没收到 animationend 也不会一直挂着 */
-    var gone = false;
-    // instant=true：点击/按键盘时立刻撤掉，不走淡出；自动结束才淡出
+
+    /* 文字版：SVG 拿不到时的降级方案（也用 Lot 之外的字体，纯 CSS 动画）。
+       注意它是「单行内联排版」，点靠基线对齐，不依赖任何度量补偿。 */
+    function buildText() {
+      frame.innerHTML =
+        '<i class="intro-rule"></i>' +
+        '<div class="intro-mark">' +
+          words.map(function (ch) { return '<span' + (ch === '.' ? ' class="intro-dot"' : '') + '>' + ch + '</span>' }).join('') +
+        '</div>' +
+        '<i class="intro-rule"></i>';
+    }
+
+    /* SVG 版：把 svg 直接内联进 DOM（不是 <img>，否则没法逐字控制动画）。
+       返回 true 表示成功接管画面；返回 false 会让调用方退回文字版。 */
+    function buildSvg(svgText) {
+      frame.innerHTML = svgText;
+      var svg = frame.querySelector('svg');
+      if (!svg) return false;
+      svg.classList.add('intro-logo');
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+
+      var letters = svg.querySelector('#letters') || svg;
+      var paths = letters.querySelectorAll('path');
+      if (!paths.length) return false;
+
+      /* 色值统一走 CSS（currentColor） */
+      svg.setAttribute('fill', 'currentColor');
+
+      /* 尺寸：让字母墨迹高度 = 与文字版相同的字高（0.768em） */
+      var fs = parseFloat(window.getComputedStyle(frame).fontSize) || 56;
+      var targetCap = fs * 0.768;
+      var vb = svg.viewBox && svg.viewBox.baseVal;
+      var bb;
+      try { bb = letters.getBBox(); } catch (e) { bb = null }
+      if (bb && bb.height > 0 && vb && vb.height > 0) {
+        svg.style.height = (targetCap * vb.height / bb.height) + 'px';
+        svg.style.setProperty('--u', bb.height + 'px');       /* 出场偏移基准 */
+      }
+
+      /* 每个字的入场倾斜角度，循环取用；--i 是出场序号（CSS 里按它算 delay）。
+         换设计、加字都不用改这里 —— 有几个 path 就排几个队。 */
+      var tilts = [-5, 4, -3, 5, -4, 2, -3, 3];
+      [].forEach.call(paths, function (p, i) {
+        p.style.setProperty('--i', i);
+        p.style.setProperty('--r', (tilts[i % tilts.length]) + 'deg');
+      });
+
+      /* 上下线也走 --i（0 上线 / 1 下线），动画基准同文字版 */
+      var rules = svg.querySelectorAll('#rule-top,#rule-bottom');
+      [].forEach.call(rules, function (l, i) { l.style.setProperty('--i', i) });
+      return true;
+    }
+    /* 高光：SVG 版自带（logo.svg 里的 #sheen-bar 被字母形状裁住，只在笔画上扫），
+       文字版才需要这里补一个元素，塞进 .intro-mark 里靠 overflow:hidden 裁住。 */
+    function addSheen() {
+      if (reduced) return;
+      if (frame.querySelector('svg.intro-logo')) return;   /* SVG 版自带高光 */
+      var mark = frame.querySelector('.intro-mark');
+      if (!mark) return;
+      var sh = document.createElement('i');
+      sh.className = 'intro-sheen';
+      sh.setAttribute('aria-hidden', 'true');
+      mark.appendChild(sh);
+    }
+
+    /* 统一入口：有 SVG 就上 SVG，失败退回文字版；然后补高光、启动淡出计时。
+       注意动画本身不需要这里触发 —— 元素一进 DOM，CSS 动画就自己跑了。 */
+    function start(svgText) {
+      var ok = false;
+      if (svgText) { try { ok = buildSvg(svgText) } catch (e) { ok = false } }
+      if (!ok) buildText();
+      addSheen();
+      tick();
+    }
+
+    var hold = reduced ? 500 : 2600;
+    var gone = false, autoTimer = null;
+    /* 淡出计时。「最后一个字」的动画结束时刻 = animation-delay + animation-duration，
+       再加 620ms（字落位后多停半秒），到点开始淡出。
+       同时挂一个 animationend 监听作为更精确的触发（两个谁先到用谁，finish 有幂等保护）。
+       万一读不到时长（老浏览器、动画被禁用），外层还有 hold 兜底。 */
+    function tick() {
+      if (reduced) { autoTimer = setTimeout(function () { finish(false) }, hold); return }
+      var spans = frame.querySelectorAll('.intro-logo [id^="ch-"], .intro-mark span');
+      var lastLetter = spans[spans.length - 1];
+      if (!lastLetter) { autoTimer = setTimeout(function () { finish(false) }, hold); return }
+      var cs = window.getComputedStyle(lastLetter);
+      var total = (parseFloat(cs.animationDelay) || 0) + (parseFloat(cs.animationDuration) || 0);
+      autoTimer = setTimeout(function () { finish(false) }, Math.round(total * 1000) + 320);
+      lastLetter.addEventListener('animationend', function () {
+        setTimeout(function () { finish(false) }, 320);
+      }, { once: true });
+    }
+
+    /* 结束进场。instant=true 是「用户点了/按了键」：立刻整个移除，不淡出；
+       false 是自然结束：加 .intro-out 走 0.9s 淡出，再移除节点。 */
     function finish(instant) {
       if (gone) return;
       gone = true;
@@ -1380,10 +1566,11 @@
       box.classList.add('intro-out');
       setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box) }, reduced ? 60 : 1000);
     }
+    /* 跳过进场：点击、触摸、Esc/空格/回车都算。
+       移除后紧跟的那一下 click 会落到下面的链接上，所以临时吞掉 click 事件 400ms。 */
     function skip(e) {
       if (e && e.cancelable && e.type !== 'keydown') e.preventDefault();
       finish(true);
-      // 立刻撤掉后，跟着的那一下 click 会落到下面的链接上，吞掉它
       function swallow(ev) { ev.preventDefault(); ev.stopPropagation(); }
       document.addEventListener('click', swallow, true);
       setTimeout(function () { document.removeEventListener('click', swallow, true) }, 400);
@@ -1394,23 +1581,22 @@
       if (gone) return;
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') skip(e);
     });
-    var autoTimer = setTimeout(function () { finish(false) }, hold);
-    /* 按最后一个字的动画时长精确算淡出时刻：延迟 + 时长 + 120ms 缓一拍 */
-    if (!reduced) {
-      var spans = box.querySelectorAll('.intro-mark span');
-      var lastLetter = spans[spans.length - 1];
-      if (lastLetter) {
-        var cs = window.getComputedStyle(lastLetter);
-        var total = (parseFloat(cs.animationDelay) || 0) + (parseFloat(cs.animationDuration) || 0);
-        if (total > 0) {
-          clearTimeout(autoTimer);
-          autoTimer = setTimeout(function () { finish(false) }, Math.round(total * 1000) + 120);
-        }
-        lastLetter.addEventListener('animationend', function () {
-          setTimeout(function () { finish(false) }, 120);
-        }, { once: true });
-      }
+
+    /* 260ms 预算：SVG 是本地小文件，通常几毫秒就到；
+       万一网络/磁盘慢，宁可先上文字版也不要让进场空着等。launch 只生效一次。 */
+    var launched = false;
+    function launch(svgText) {
+      if (launched) return;
+      launched = true;
+      start(svgText);
     }
+    var budget = setTimeout(function () { launch(null) }, 260);
+    /* 用 force-cache：这个文件几乎不变，缓存住最省事。
+       失败（file:// 打开、文件缺失）就走 catch → launch(null) → 文字版。 */
+    fetch(url('assets/logo.svg'), { cache: 'force-cache' })
+      .then(function (r) { if (!r.ok) throw new Error('http'); return r.text() })
+      .then(function (txt) { clearTimeout(budget); launch(txt) })
+      .catch(function () { clearTimeout(budget); launch(null) });
   }
 
   function initNav() {    var page = document.body.dataset.page || '';

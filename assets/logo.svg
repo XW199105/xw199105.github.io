@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 进场 LOGO：VVXIE.CN + 上下两条线 + 字内高光。可直接用 Illustrator 改。
+     约定（改的时候请保留）：
+     1) 每个字符一个 <path>，id 依次 ch-1 … ch-8，顺序即出场顺序；
+     2) 两条线 <rect id="rule-top/rule-bottom">，fill=currentColor，粗细随字高缩放；
+     3) 高光 = #sheen-bar 一条白带，被 #logo-clip（字母形状）裁住，只在字内扫过；
+        不想要闪光，把整段 <g id="sheen"> 删掉即可；
+     4) 只用路径几何（不要 <text>），fill 用 currentColor；
+     5) viewBox 贴合内容，页面按「字母墨迹高度」自动缩放。 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23 -1334 5850 1879" width="585" height="187.9">
+  <defs>
+    <clipPath id="logo-clip" clipPathUnits="userSpaceOnUse">
+      <path d="M862.0 701C93.0 701 750.0 701 -23.0 701L420.0 -49L862.0 701Z"/>
+      <path d="M1800.0 701C1031.0 701 1688.0 701 915.0 701L1358.0 -49L1800.0 701Z"/>
+      <path d="M1878.0 701 2074.0 351 1878.0 1C2410.0 1 2078.0 1 2620.0 1L2424.0 351L2620.0 701C2066.0 701 2421.0 701 1878.0 701Z"/>
+      <path d="M2753.0 700V0H3117.0V700H2753.0Z"/>
+      <path d="M3276.0 701V1H3856.0V237H3711.0V267H3856.0V435H3711.0V465H3856.0V701H3276.0Z"/>
+      <path d="M4118.0 202C4057.0 202 4006.0 153 4006.0 91C4006.0 35 4057.0 -14 4118.0 -14C4183.0 -14 4234.0 35 4234.0 91C4234.0 153 4183.0 202 4118.0 202Z"/>
+      <path d="M4476.0 611C4332.0 467 4332.0 234 4476.0 90C4620.0 -54 4853.0 -54 4997.0 90L4736.0 351L4997.0 611C4853.0 755 4620.0 755 4476.0 611Z"/>
+      <path d="M5127.0 717V0C5772.0 0 5182.0 0 5827.0 0V700H5479.0V442L5127.0 717Z"/>
+    </clipPath>
+    <linearGradient id="sheen-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".32" stop-color="#fff" stop-opacity=".10"/>
+      <stop offset=".50" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".68" stop-color="#fff" stop-opacity=".10"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g transform="scale(1,-1)">
+    <g id="rules" fill="currentColor" opacity=".6">   <!-- 两条线比字浅：60% 不透明 -->
+      <rect id="rule-top" x="-23" y="1318.64" width="5850" height="30.72"/>
+      <rect id="rule-bottom" x="-23" y="-560.36" width="5850" height="30.72"/>
+    </g>
+    <g id="letters" fill="currentColor">
+      <path id="ch-1" d="M862.0 701C93.0 701 750.0 701 -23.0 701L420.0 -49L862.0 701Z"/>
+      <path id="ch-2" d="M1800.0 701C1031.0 701 1688.0 701 915.0 701L1358.0 -49L1800.0 701Z"/>
+      <path id="ch-3" d="M1878.0 701 2074.0 351 1878.0 1C2410.0 1 2078.0 1 2620.0 1L2424.0 351L2620.0 701C2066.0 701 2421.0 701 1878.0 701Z"/>
+      <path id="ch-4" d="M2753.0 700V0H3117.0V700H2753.0Z"/>
+      <path id="ch-5" d="M3276.0 701V1H3856.0V237H3711.0V267H3856.0V435H3711.0V465H3856.0V701H3276.0Z"/>
+      <path id="ch-6" d="M4118.7 126.4C4079.05 126.4 4045.9 94.55 4045.9 54.250000000000014C4045.9 17.85 4079.05 -14.0 4118.7 -14.0C4160.950000000001 -14.0 4194.1 17.85 4194.1 54.250000000000014C4194.1 94.55 4160.950000000001 126.4 4118.7 126.4Z"/>
+      <path id="ch-7" d="M4476.0 611C4332.0 467 4332.0 234 4476.0 90C4620.0 -54 4853.0 -54 4997.0 90L4736.0 351L4997.0 611C4853.0 755 4620.0 755 4476.0 611Z"/>
+      <path id="ch-8" d="M5127.0 717V0C5772.0 0 5182.0 0 5827.0 0V700H5479.0V442L5127.0 717Z"/>
+    </g>
+    <g id="sheen" clip-path="url(#logo-clip)">
+      <rect id="sheen-bar" x="-23" y="-1108.7" width="2574" height="3006.4" fill="url(#sheen-grad)"/>
+    </g>
+  </g>
+</svg>
