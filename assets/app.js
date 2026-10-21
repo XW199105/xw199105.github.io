@@ -1496,19 +1496,11 @@
     var frame = box.querySelector('.intro-frame');
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* 文字版：SVG 拿不到时的降级方案（也用 Lot 之外的字体，纯 CSS 动画）。
-       注意它是「单行内联排版」，点靠基线对齐，不依赖任何度量补偿。 */
-    function buildText() {
-      frame.innerHTML =
-        '<i class="intro-rule"></i>' +
-        '<div class="intro-mark">' +
-          words.map(function (ch) { return '<span' + (ch === '.' ? ' class="intro-dot"' : '') + '>' + ch + '</span>' }).join('') +
-        '</div>' +
-        '<i class="intro-rule"></i>';
-    }
+    /* 只有 SVG 版。拿不到 SVG 就不播（点了跳过一样的效果），
+       绝不再退回到「字体版」LOGO —— 那个字形和设计稿不一致。 */
 
     /* SVG 版：把 svg 直接内联进 DOM（不是 <img>，否则没法逐字控制动画）。
-       返回 true 表示成功接管画面；返回 false 会让调用方退回文字版。 */
+       返回 true 表示成功接管画面。 */
     function buildSvg(svgText) {
       frame.innerHTML = svgText;
       var svg = frame.querySelector('svg');
@@ -1543,40 +1535,20 @@
         p.style.setProperty('--r', (tilts[i % tilts.length]) + 'deg');
       });
 
-      /* 上下线也走 --i（0 上线 / 1 下线），动画基准同文字版 */
+      /* 上下线也走 --i（0 上线 / 1 下线） */
       var rules = svg.querySelectorAll('#rule-top,#rule-bottom');
       [].forEach.call(rules, function (l, i) { l.style.setProperty('--i', i) });
       return true;
     }
-    /* 高光：SVG 版自带（logo.svg 里的 #sheen-bar 被字母形状裁住，只在笔画上扫），
-       文字版才需要这里补一个元素，塞进 .intro-mark 里靠 overflow:hidden 裁住。 */
-    function addSheen() {
-      if (reduced) return;
-      if (frame.querySelector('svg.intro-logo')) return;   /* SVG 版自带高光 */
-      var mark = frame.querySelector('.intro-mark');
-      if (!mark) return;
-      var sh = document.createElement('i');
-      sh.className = 'intro-sheen';
-      sh.setAttribute('aria-hidden', 'true');
-      mark.appendChild(sh);
-    }
 
-    /* 文字版用到的字符表（SVG 版不需要它）。放在这里，降级分支才拿得到。 */
-    var words = ['V', 'V', 'X', 'I', 'E', '.', 'C', 'N'];
-
-    /* 统一入口：有 SVG 就上 SVG，失败退回文字版；然后补高光、启动淡出计时。
-       注意动画本身不需要这里触发 —— 元素一进 DOM，CSS 动画就自己跑了。
+    /* 统一入口：只认 SVG 版。拿不到就结束进场（等于跳过），绝不出现字体版 LOGO。
        这里全程 try 包住：任何一步出错都只是少一点效果，绝不能把用户困在三个点上。 */
     function start(svgText) {
       var ok = false;
       if (svgText) { try { ok = buildSvg(svgText) } catch (e) { ok = false } }
-      if (!ok) { try { buildText() } catch (e) {} }
+      if (!ok) { finish(false); return; }     /* 没有 SVG：直接淡出收场，不显示字体版 */
       frame.classList.remove('is-loading');   /* 三个点的占位状态可以撤了 */
-      try { addSheen() } catch (e) {}
-      try { tick() } catch (e) {}
-
-      /* 最后一道保险：两种画面都没成功 → 不要停在三个点上，直接结束进场 */
-      if (!frame.querySelector('.intro-logo, .intro-mark')) finish(false);
+      try { tick() } catch (e) { finish(false); }
     }
 
     var hold = reduced ? 500 : 2600;
@@ -1587,7 +1559,7 @@
        万一读不到时长（老浏览器、动画被禁用），外层还有 hold 兜底。 */
     function tick() {
       if (reduced) { autoTimer = setTimeout(function () { finish(false) }, hold); return }
-      var spans = frame.querySelectorAll('.intro-logo [id^="ch-"], .intro-mark span');
+      var spans = frame.querySelectorAll('.intro-logo [id^="ch-"]');
       var lastLetter = spans[spans.length - 1];
       if (!lastLetter) { autoTimer = setTimeout(function () { finish(false) }, hold); return }
       var cs = window.getComputedStyle(lastLetter);
@@ -1630,8 +1602,8 @@
 
     /* 取 LOGO：
        ① 本次会话里取过就存在 sessionStorage（3.6KB，很小），下次直接同步用，连请求都不用；
-       ② 没缓存才 fetch；260ms 内没回来就先上文字版，绝不让进场空着等；
-       ③ 任何一步失败都退回文字版，而且 start() 里还有「两种都失败就直接结束」的保险。 */
+       ② 没缓存才 fetch；1200ms 还拿不到就直接跳过（不显示字体版），绝不让进场空着等；
+       ③ 失败就跳过（淡出收场），不再退回「字体版」LOGO。 */
     var launched = false;
     function launch(svgText) {
       if (launched) return;
@@ -1643,7 +1615,7 @@
     try { cachedLogo = sessionStorage.getItem(LOGO_CACHE) || '' } catch (e) { cachedLogo = '' }
     if (cachedLogo) { launch(cachedLogo); return; }
 
-    var budget = setTimeout(function () { launch(null) }, 260);
+    var budget = setTimeout(function () { launch(null) }, 1200);
     fetch(url('assets/logo.svg'), { cache: 'force-cache' })
       .then(function (r) { if (!r.ok) throw new Error('http'); return r.text() })
       .then(function (txt) {
