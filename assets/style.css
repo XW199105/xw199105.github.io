@@ -187,7 +187,7 @@ img{max-width:100%}
   .note-card{position:relative;display:block;min-height:112px;padding:0;border:0;
     background:var(--soft);overflow:hidden;border-radius:3px}
   .note-card .note-cover{position:absolute;inset:0;width:100%;height:100%;flex:none;
-    aspect-ratio:auto;object-fit:cover;object-position:center top;z-index:0;border-radius:0}
+    aspect-ratio:auto;object-fit:cover;object-position:center center;z-index:0;border-radius:0}   /* 上下居中裁，不切到标题 */
   .note-card::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.6);z-index:1}
   .note-card .note-text{position:relative;z-index:2;display:flex;flex-direction:column;
     justify-content:center;min-height:112px;padding:22px 20px}
