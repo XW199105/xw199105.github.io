@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-21",
+  "updated": "2026-10-25",
   "aboutHeading": "韦韦谢VVXIE",
   "aboutText": "       我是V，一个3D玩家。\n做过游戏、动画、插画、雕塑、潮玩手办等等。\n传统手工艺人，现在就做点原创实物作品。",
   "contactHeading": "传送门",
@@ -28,6 +28,11 @@
       "icon": "shopping",
       "label": "点击进入-淘宝",
       "url": "https://shop179636776.taobao.com/"
+    },
+    {
+      "icon": "web",
+      "label": "点击进入-Artstation",
+      "url": "http://www.artstation.com/artist/XMNW"
     }
   ],
   "avatar": "about/avatar.svg",
