@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-20",
+  "updated": "2026-11-02",
   "base": "notes",
   "notes": [
     {
@@ -48,7 +48,7 @@
       "id": "2026-10-ot",
       "title": "随便写点什么",
       "date": "2026-10-20",
-      "pinned": true,
+      "pinned": false,
       "tags": [
         "无关碎碎念"
       ],
@@ -56,7 +56,21 @@
       "content": "notes/2026-10-ot/content.md",
       "html": "notes/2026-10-ot/content.html",
       "cover": "cover.jpg",
-      "body": "用AI搭了一个自己的个人小站，真是方便强大。现在是挂的是GitHub静态页面托管，所以首次加载会比较慢。用国内的节点，域名必须得ICP备案。备案就必须得租国内云服务器，蒜鸟蒜鸟。静态意思就是后台没有跑逻辑程序，没有动态数据存储这些，就纯展示。反正这里没有流量、点赞、评论、 热度这"
+      "body": "用AI搭了一个这个小站，真是方便强大。页面倒是简单，但是内容维护编辑器搞了很久，总算差不多了。现在是挂的是GitHub静态页面托管，所以首次加载会比较慢。静态就是后台没有跑逻辑程序，没有动态数据存储这些，就纯展示。要是用国内的节点，域名必须得ICP备案。备案就还得租国内云服务器，"
+    },
+    {
+      "id": "2026-11-Plugin_V_Drone_GamePad",
+      "title": "Blender通过游戏手柄操作镜头插件",
+      "date": "2026-11-02",
+      "pinned": false,
+      "tags": [
+        "插件分享"
+      ],
+      "meta": "notes/2026-11-Plugin_V_Drone_GamePad/meta.json",
+      "content": "notes/2026-11-Plugin_V_Drone_GamePad/content.md",
+      "html": "notes/2026-11-Plugin_V_Drone_GamePad/content.html",
+      "cover": "cover.jpg",
+      "body": "V_Drone_GamePad_v3.9.4链接: https://pan.baidu.com/s/1be6PbP5VVftYzwIhhOg5Xw?pwd=vy2u 提取码: vy2u在完成作品想要展示的时候，我一般懒得去K镜头动画，又觉得鼠标手摇镜头差点意思。要是有像无人机那样"
     }
   ]
 }
